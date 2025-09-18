@@ -1,0 +1,123 @@
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    FlatList,
+    StyleSheet,
+    Alert,
+    Pressable,
+} from "react-native";
+import { useEffect, useState } from "react";
+
+import { Ionicons } from "@expo/vector-icons";
+import { auth, db } from "../../src/firebaseConnection";
+import { collection, addDoc, onSnapshot } from "firebase/firestore";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { colors } from "../../components/ui/colors";
+import { st } from "../../components/ui/myStyles";
+import { router } from "expo-router";
+import {Header} from '../../components/tags/header';
+import Divider from '../../components/secundario/divider';
+import Botao2 from '../../components/secundario/botao2';
+import {Feather} from '@expo/vector-icons';
+import { SafeAreaView } from "react-native-safe-area-context";
+
+
+export default function ListagemListas() {
+    const [listas, setListas] = useState([]);
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const unsubscribeAuth = onAuthStateChanged(auth, (userAtual) => {
+            console.log("Verificando login...");
+            if (userAtual) {
+                console.log("Usuário logado:", userAtual.uid);
+                setUser(userAtual);
+            } else {
+                console.log("Usuário deslogado");
+                router.push("../login");
+            }
+        });
+
+        return () => unsubscribeAuth();
+    }, []);
+
+    useEffect(() => {
+        if (!user) return;
+
+        console.log("Escutando listas do usuário:", user.uid);
+        const unsub = onSnapshot(
+            collection(db, "usuarios", user.uid, "listas"),
+            (snapshot) => {
+                const dados = snapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+                console.log("Listas atualizadas:", dados);
+                setListas(dados);
+            }
+        );
+
+        return () => unsub();
+    }, [user]);
+    async function deslogar() {
+        signOut(auth)
+            .then(() => {
+                alert("Sessão encerrada, faça login novamente");
+                console.log("Deslogou e Redirecionou");
+                router.replace("../");
+            })
+            .catch((err) => Alert.alert("Erro", err.code + "\n" + err.message));
+    }
+
+    return (
+        <SafeAreaView>
+        <Header titulo="Peladas" descricao="Listas da sua pelada"/>
+        <View style={st.container}>
+            <View>
+                <Text className="text-lg">Peladas Cadastradas:</Text>
+            </View>
+            <View style={{ flexDirection: "row",marginHorizontal:'-20' }}>
+                <FlatList
+                    data={listas}
+                    contentContainerStyle={{gap:20,paddingHorizontal:20}}
+                    horizontal={true}
+                    showsHorizontalScrollIndicator={false}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity
+                            className="bg-white p-5 px-8 rounded-lg border-2 border-slate-100 gap-2"
+                            onPress={() => router.push(`../listas/${item.id}`)}
+                        >
+                            <View className="flex-row gap-2 items-center">
+                                <Feather name="map-pin" size={14} color="gray" />
+                                <Text className="text-md">{item.nome}</Text>
+                                </View>
+                                <Divider/>
+                            <View className="flex-row gap-2 items-center">
+                                <Feather name="users" size={14} color="gray" />
+                                <Text className="text-md">{item.jogadoresNaLinha} na Linha</Text>
+                                </View>
+                                <Divider/>
+                            <View className="flex-row gap-2 items-center">
+                                <Feather name="clock" size={14} color="gray" />
+                                <Text className="text-md">{item.cronometro} min</Text>
+                                </View>
+                            <Botao2 cta="Entrar" onpress={() => router.push(`../listas/${item.id}`)}/>
+                            <TouchableOpacity onPress={()=> router.push(`../listas/${item.id}`)} className="rounded-full p-2 justify-center items-center mt-2" style={{ backgroundColor: colors.green }}>
+                                <Text className="text-md text-white">Entrar</Text>
+                            </TouchableOpacity>
+                        </TouchableOpacity>
+                    )}
+                    ListEmptyComponent={
+                        <Text style={st.vazio}>Nenhuma lista ainda.</Text>
+                    }
+                />
+            </View>
+            <Pressable style={st.pressable} onPress={deslogar}>
+                <Text style={st.texto}>Deslogar</Text>
+            </Pressable>
+        </View>
+                    </SafeAreaView>
+    );
+}
