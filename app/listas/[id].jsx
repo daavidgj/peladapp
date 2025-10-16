@@ -1,23 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useLocalSearchParams, router } from "expo-router";
-import {
-    View,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    Pressable,
-    Alert,
-    FlatList,
-} from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Pressable, Alert, FlatList, Keyboard, Vibration } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
 import { auth, db } from "../../src/firebaseConnection";
 
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 
 import { colors } from "../../components/ui/colors";
 import { st } from "../../components/ui/myStyles";
+import MyInputText from "../../components/secundario/myInputText";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CadastroJogador() {
     const [user, setUser] = useState(null);
@@ -31,6 +25,7 @@ export default function CadastroJogador() {
     const [jogadores, setJogadores] = useState({});
     const [jogadoresNaLinha, setJogadoresNaLinha] = useState(4);
     const [ordemFilas, setOrdemFilas] = useState([1, 2, 3]);
+    const [emCampo, setEmCampo] = useState(false);
 
     // Autenticação
     useEffect(() => {
@@ -40,7 +35,6 @@ export default function CadastroJogador() {
         });
         return unsubscribeAuth;
     }, []);
-
     // Buscar dados iniciais do Firestore
     useEffect(() => {
         async function buscarDadosIniciais() {
@@ -50,9 +44,10 @@ export default function CadastroJogador() {
                 if (snap.exists()) {
                     const dados = snap.data();
                     setJogadoresNaLinha(dados.jogadoresNaLinha || 4);
-                    setTempo(dados.tempoPartida || 0); // pega tempo inicial do banco
+                    setTempo(dados.tempoPartida || 7); // pega tempo inicial do banco
                     setJogadores(dados.jogadores || {});
                     setOrdemFilas(dados.ordemFilas || [1, 2, 3]);
+                    setEmCampo(dados.emCampo || false);
                 }
             }
         }
@@ -74,28 +69,6 @@ export default function CadastroJogador() {
         }
     }, [jogadores, ordemFilas]);
 
-    // Controle do cronômetro local
-    useEffect(() => {
-        if (rodando) {
-            if (!intervaloRef.current) {
-                intervaloRef.current = setInterval(() => {
-                    setTempo((t) => t + 1); // incrementa 1 segundo
-                }, 1000);
-            }
-        } else {
-            if (intervaloRef.current) {
-                clearInterval(intervaloRef.current);
-                intervaloRef.current = null;
-            }
-        }
-        return () => {
-            if (intervaloRef.current) {
-                clearInterval(intervaloRef.current);
-                intervaloRef.current = null;
-            }
-        };
-    }, [rodando]);
-
     // Função para salvar jogadores e ordemFilas no banco (sem tempo)
     async function salvarDadosNoBanco() {
         if (!user || !id) return;
@@ -105,6 +78,7 @@ export default function CadastroJogador() {
                 jogadores,
                 ordemFilas,
                 jogadoresNaLinha,
+                emCampo,
             });
         } catch (error) {
             console.error("Erro ao salvar dados:", error);
@@ -114,7 +88,7 @@ export default function CadastroJogador() {
     // Salva no banco jogadores, filas e jogadoresNaLinha quando mudam
     useEffect(() => {
         salvarDadosNoBanco();
-    }, [jogadores, ordemFilas, jogadoresNaLinha]);
+    }, [jogadores, ordemFilas, jogadoresNaLinha, emCampo]);
 
     function adicionarJogador(fila) {
         const nome = (nomeJogador[fila] || "").trim();
@@ -138,9 +112,7 @@ export default function CadastroJogador() {
 
     function removerJogador(fila, jogadorId) {
         setJogadores((prev) => {
-            const novaFila = (prev[fila] || []).filter(
-                (j) => j.id !== jogadorId
-            );
+            const novaFila = (prev[fila] || []).filter((j) => j.id !== jogadorId);
             return { ...prev, [fila]: novaFila };
         });
     }
@@ -152,13 +124,88 @@ export default function CadastroJogador() {
             return novaOrdem;
         });
     }
+    function moverFilaParaCima(fila) {
+        setOrdemFilas((prev) => {
+            const index = prev.indexOf(fila);
+            Vibration.vibrate(100);
+            if (index <= 0) return prev; // já está no topo
+            const novaOrdem = [...prev];
+            [novaOrdem[index - 1], novaOrdem[index]] = [novaOrdem[index], novaOrdem[index - 1]];
+            return novaOrdem;
+        });
+    }
 
-    function formatarTempo(segundos) {
-        const min = Math.floor(segundos / 60);
-        const seg = segundos % 60;
-        return `${min.toString().padStart(2, "0")}:${seg
-            .toString()
-            .padStart(2, "0")}`;
+    function moverFilaParaBaixo(fila) {
+        setOrdemFilas((prev) => {
+            const index = prev.indexOf(fila);
+            Vibration.vibrate(100);
+            if (index === -1 || index === prev.length - 1) return prev; // já está no fim
+            const novaOrdem = [...prev];
+            [novaOrdem[index + 1], novaOrdem[index]] = [novaOrdem[index], novaOrdem[index + 1]];
+            return novaOrdem;
+        });
+    }
+    async function excluirFila(fila) {
+        if (!user || !id) return;
+
+        try {
+            const docRef = doc(db, "usuarios", user.uid, "listas", id);
+
+            // 1️⃣ Remove todos os jogadores da fila
+            const novosJogadores = { ...jogadores };
+            if (novosJogadores[fila]) {
+                delete novosJogadores[fila];
+            }
+
+            // 2️⃣ Remove a fila da ordem
+            const novaOrdemFilas = ordemFilas.filter((f) => f !== fila);
+
+            // 3️⃣ Atualiza estado local
+            setJogadores(novosJogadores);
+            setOrdemFilas(novaOrdemFilas);
+
+            // 4️⃣ Atualiza Firestore
+            await updateDoc(docRef, {
+                jogadores: novosJogadores,
+                ordemFilas: novaOrdemFilas,
+            });
+
+            Alert.alert("Sucesso", `Equipe ${fila} entrou em campo!`);
+        } catch (error) {
+            console.error("Erro ao subir equipe: ", error, "em campo");
+            Alert.alert("Erro", "Não foi possível subir a equipe para o campo.");
+        }
+    }
+    function completarEquipe(fila) {
+        const jogadoresFila = jogadores[fila] || [];
+        const faltando = jogadoresNaLinha - jogadoresFila.length;
+
+        if (faltando <= 0) return; // equipe já está completa
+
+        // Pegar jogadores disponíveis das outras filas
+        const novosJogadores = { ...jogadores };
+        let jogadoresAdicionados = [];
+
+        for (let f of ordemFilas) {
+            if (f === fila) continue; // ignora a fila atual
+            const filaAtual = novosJogadores[f] || [];
+
+            while (filaAtual.length > 0 && jogadoresAdicionados.length < faltando) {
+                const jogador = filaAtual.shift(); // pega o primeiro jogador
+                jogadoresAdicionados.push(jogador);
+            }
+
+            novosJogadores[f] = filaAtual; // atualiza a fila sem os jogadores movidos
+            if (jogadoresAdicionados.length === faltando) break;
+        }
+
+        // Atualiza a fila que vai para o campo
+        novosJogadores[fila] = [...jogadoresFila, ...jogadoresAdicionados];
+        setJogadores(novosJogadores);
+
+        // Agora você pode seguir com o que faz no "Entrar em Campo"
+        setEmCampo(true);
+        salvarDadosNoBanco();
     }
 
     const renderFila = ({ item: fila }) => {
@@ -166,94 +213,85 @@ export default function CadastroJogador() {
         const filaCheia = jogadoresFila.length >= jogadoresNaLinha;
 
         return (
-            <View>
+            <View className="p-6 gap-5">
                 <Pressable onPress={() => moverFilaParaFim(fila)}>
-                    <Text style={st.h2}>Fila {fila} </Text>
+                    <Text style={st.h2}> Próximo da Fila: Equipe {fila} </Text>
                 </Pressable>
-                <View
-                    style={{
-                        backgroundColor: "#111111",
-                        borderWidth: 3,
-                        borderColor: colors.dark,
-                        padding: 5,
-                        borderRadius: 10,
-                        marginVertical: 30,
-                    }}
-                >
+                <View className="bg-white border-2 border-slate-200 rounded-lg py-5 px-4 gap-1">
+                    <View className="justify-between flex-row mb-5">
+                        <View className="items-center justify-center">
+                            <Text className="text-lg font-bold" style={{ color: colors.green }}>
+                                Equipe {fila}
+                            </Text>
+                        </View>
+                        <View className="justify-between flex-row gap-5">
+                            {ordemFilas.indexOf(fila) != 0 && (
+                                <TouchableOpacity className="p-1 rounded-lg bg-slate-500" onPress={() => moverFilaParaCima(fila)}>
+                                    <Ionicons name="chevron-up" size={22} color={colors.primary} />
+                                </TouchableOpacity>
+                            )}
+                            {ordemFilas.indexOf(fila) != ordemFilas.length - 1 && (
+                                <TouchableOpacity className="p-1 rounded-lg bg-slate-500 justify-center" onPress={() => moverFilaParaBaixo(fila)}>
+                                    <Ionicons name="chevron-down" size={22} color={colors.primary} />
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                    </View>
                     <FlatList
                         data={jogadoresFila}
                         keyExtractor={(jog) => jog.id}
                         renderItem={({ item }) => (
-                            <View style={st.jogadorcard1}>
-                                <Ionicons
-                                    name="person-circle-outline"
-                                    size={24}
-                                    color="#ffffff"
-                                />
-                                <Text style={st.jogadorNome}>{item.nome}</Text>
-                                <Pressable
-                                    onPress={() =>
-                                        removerJogador(fila, item.id)
-                                    }
-                                    style={{ marginLeft: 10 }}
-                                >
-                                    <Text
-                                        style={{ color: "red", fontSize: 18 }}
-                                    >
-                                        🗑️
-                                    </Text>
+                            <View className="bg-slate-100 border-b-2 border-slate-200 flex-row justify-between items-center px-2 py-1 rounded-lg mb-2">
+                                <View className="flex-row gap-2 items-center">
+                                    <Ionicons name="person-circle-outline" size={24} color={colors.green} />
+                                    <Text className="text-lg">{item.nome}</Text>
+                                </View>
+                                <Pressable onPress={() => removerJogador(fila, item.id)} style={{ marginLeft: 10, padding: 5 }}>
+                                    <Ionicons name="trash" size={18} color={colors.secondary} />
                                 </Pressable>
                             </View>
                         )}
-                        style={{
-                            flexGrow: 1,
-                            padding: 5,
-                            marginTop: 30,
-                        }}
-                        nestedScrollEnabled
                     />
 
                     {!filaCheia && (
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                marginTop: 10,
-                            }}
-                        >
-                            <TextInput
-                                style={[
-                                    st.formInput,
-                                    {
-                                        flex: 1,
-                                        color: colors.white,
-                                        height: 70,
-                                    },
-                                ]}
-                                placeholder={`Nome jogador fila ${fila}`}
-                                placeholderTextColor={"#777777"}
-                                value={nomeJogador[fila] || ""}
-                                onChangeText={(text) =>
-                                    setNomeJogador((prev) => ({
-                                        ...prev,
-                                        [fila]: text,
-                                    }))
-                                }
-                            />
-                            <TouchableOpacity
-                                style={[
-                                    st.btn,
-                                    {
-                                        marginLeft: 8,
-                                        height: 60,
-                                        marginTop: "2",
-                                    },
-                                ]}
-                                onPress={() => adicionarJogador(fila)}
-                            >
-                                <Text style={st.texto}>+</Text>
+                        <View className="flex-row items-center w-full justify-between gap-5">
+                            <View className="flex-1">
+                                <MyInputText
+                                    placeholder={"Digite o Nome do jogador"}
+                                    value={nomeJogador[fila] || ""}
+                                    onChangeText={(text) => setNomeJogador((prev) => ({ ...prev, [fila]: text }))}
+                                />
+                            </View>
+                            <TouchableOpacity className="bg-green-500 p-2 rounded-full" onPress={() => adicionarJogador(fila)}>
+                                <Ionicons name="add" size={24} color="white" />
                             </TouchableOpacity>
+                        </View>
+                    )}
+                    {ordemFilas.indexOf(fila) === 0 && (
+                        <View className="gap-2 items-center mt-5" style={{ marginBottom: "-40" }}>
+                            {jogadoresFila.length < jogadoresNaLinha ? (
+                                <>
+                                    <Text className="text-center" style={{ color: "#ff2222" }}>
+                                        Preencha a Equipe
+                                    </Text>
+                                    <TouchableOpacity className={"p-3 rounded-full w-9/12 mx-auto mt-2 bg-slate-500"} onPress={() => completarEquipe(fila)}>
+                                        <Text className="text-white text-center text-lg">Preencher Lista</Text>
+                                    </TouchableOpacity>
+                                </>
+                            ) : (
+                                <TouchableOpacity
+                                    style={{ backgroundColor: colors.green }}
+                                    className={"p-3 rounded-full w-9/12"}
+                                    onPress={() =>
+                                        Alert.alert("Confirmar", "Deseja realmente subir a equipe?", [
+                                            { text: "Cancelar", style: "cancel" },
+                                            { text: "Entrar", style: "destructive", onPress: () => excluirFila(fila) },
+                                        ])
+                                    }
+                                >
+                                    <Text className="text-white text-center text-lg">Entrar em Campo</Text>
+                                </TouchableOpacity>
+                            )}
                         </View>
                     )}
                 </View>
@@ -262,33 +300,18 @@ export default function CadastroJogador() {
     };
 
     return (
-        <View style={st.container}>
-            <Pressable
-                style={{
-                    alignSelf: "center",
-                    backgroundColor: colors.primary,
-                    padding: 10,
-                    borderRadius: 8,
-                    marginBottom: 20,
-                }}
-                onPress={() => setRodando((r) => !r)}
-            >
-                <Text
-                    style={{ color: "#fff", fontSize: 20, fontWeight: "bold" }}
-                >
-                    {rodando ? "⏸️ " : "▶️ "} {formatarTempo(tempo)}
-                </Text>
-            </Pressable>
+        <SafeAreaView style={{ flex: 1 }}>
+            <View className="flex-1 justify-center items-center p-6 px-3" style={{ paddingBottom: 100 }}>
+                <Text className="text-xl font-bold">Lista </Text>
 
-            <Text style={st.h1}>Gerenciar Jogadores</Text>
-
-            <FlatList
-                data={ordemFilas}
-                keyExtractor={(item) => item.toString()}
-                renderItem={renderFila}
-                extraData={{ jogadores, nomeJogador, jogadoresNaLinha }}
-                nestedScrollEnabled
-            />
-        </View>
+                <FlatList
+                    data={ordemFilas}
+                    keyExtractor={(item) => item.toString()}
+                    renderItem={renderFila}
+                    extraData={{ jogadores, nomeJogador, jogadoresNaLinha }}
+                    nestedScrollEnabled
+                />
+            </View>
+        </SafeAreaView>
     );
 }

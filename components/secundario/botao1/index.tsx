@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { colors } from "../../ui/colors";
 
-export default function Botao2({ cta, onpress, type }) {
+export default function Botao1({ cta, onpress, type }) {
     let backcolortype;
     switch (type) {
         case 1:
@@ -18,8 +18,16 @@ export default function Botao2({ cta, onpress, type }) {
             backcolortype = colors.green;
     }
     return (
-        <TouchableOpacity onPress={onpress} className="rounded-full px-4 py-2 justify-center items-center mt-2" style={{ backgroundColor: backcolortype }}>
-            <Text className="text-base tracking-widest text-white">{cta}</Text>
+        <TouchableOpacity
+            onPress={onpress}
+            className="rounded-lg px-4 py-2 justify-center items-center mt-2 "
+            style={{ backgroundColor: backcolortype, width: "80%" }}
+        >
+            <View>
+                <Text className="text-white  tracking-widest" style={{ fontSize: 18 }}>
+                    {cta}
+                </Text>
+            </View>
         </TouchableOpacity>
     );
 }

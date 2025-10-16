@@ -1,12 +1,4 @@
-import {
-    View,
-    Text,
-    TouchableOpacity,
-    FlatList,
-    StyleSheet,
-    Alert,
-    Pressable,
-} from "react-native";
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert, Pressable } from "react-native";
 import { useEffect, useState } from "react";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -16,12 +8,11 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { colors } from "../../components/ui/colors";
 import { st } from "../../components/ui/myStyles";
 import { router } from "expo-router";
-import {Header} from '../../components/tags/header';
-import Divider from '../../components/secundario/divider';
-import Botao2 from '../../components/secundario/botao2';
-import {Feather} from '@expo/vector-icons';
+import { Header } from "../../components/tags/header";
+import Divider from "../../components/secundario/divider";
+import Botao2 from "../../components/secundario/botao2";
+import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 
 export default function ListagemListas() {
     const [listas, setListas] = useState([]);
@@ -46,17 +37,14 @@ export default function ListagemListas() {
         if (!user) return;
 
         console.log("Escutando listas do usuário:", user.uid);
-        const unsub = onSnapshot(
-            collection(db, "usuarios", user.uid, "listas"),
-            (snapshot) => {
-                const dados = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
-                console.log("Listas atualizadas:", dados);
-                setListas(dados);
-            }
-        );
+        const unsub = onSnapshot(collection(db, "usuarios", user.uid, "listas"), (snapshot) => {
+            const dados = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            console.log("Listas atualizadas:", dados);
+            setListas(dados);
+        });
 
         return () => unsub();
     }, [user]);
@@ -71,53 +59,48 @@ export default function ListagemListas() {
     }
 
     return (
-        <SafeAreaView>
-        <Header titulo="Peladas" descricao="Listas da sua pelada"/>
-        <View style={st.container}>
-            <View>
-                <Text className="text-lg">Peladas Cadastradas:</Text>
-            </View>
-            <View style={{ flexDirection: "row",marginHorizontal:'-20' }}>
-                <FlatList
-                    data={listas}
-                    contentContainerStyle={{gap:20,paddingHorizontal:20}}
-                    horizontal={true}
-                    showsHorizontalScrollIndicator={false}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity
-                            className="bg-white p-5 px-8 rounded-lg border-2 border-slate-100 gap-2"
-                            onPress={() => router.push(`../listas/${item.id}`)}
-                        >
-                            <View className="flex-row gap-2 items-center">
-                                <Feather name="map-pin" size={14} color="gray" />
-                                <Text className="text-md">{item.nome}</Text>
+        <SafeAreaView style={st.container}>
+            <Header titulo="Peladas" descricao="Listas da sua pelada" />
+            <View className="flex-1 justify-start px-6 pt-2 gap-3">
+                <View>
+                    <Text className="text-lg text-black ">Peladas Cadastradas:</Text>
+                </View>
+                <View style={{ flexDirection: "row", marginHorizontal: "-20" }}>
+                    <FlatList
+                        data={listas}
+                        contentContainerStyle={{ gap: 20, paddingHorizontal: 20 }}
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={false}
+                        keyExtractor={(item) => item.id}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity
+                                className="bg-white p-5 px-8 rounded-lg border-2 border-slate-100 gap-2"
+                                onPress={() => router.push(`../listas/${item.id}`)}
+                            >
+                                <View className="flex-row gap-2 items-center">
+                                    <Feather name="map-pin" size={14} color="gray" />
+                                    <Text className="text-md">{item.nome}</Text>
                                 </View>
-                                <Divider/>
-                            <View className="flex-row gap-2 items-center">
-                                <Feather name="users" size={14} color="gray" />
-                                <Text className="text-md">{item.jogadoresNaLinha} na Linha</Text>
+                                <Divider />
+                                <View className="flex-row gap-2 items-center">
+                                    <Feather name="users" size={14} color="gray" />
+                                    <Text className="text-md">{item.jogadoresNaLinha} na Linha</Text>
                                 </View>
-                                <Divider/>
-                            <View className="flex-row gap-2 items-center">
-                                <Feather name="clock" size={14} color="gray" />
-                                <Text className="text-md">{item.cronometro} min</Text>
+                                <Divider />
+                                <View className="flex-row gap-2 items-center">
+                                    <Feather name="clock" size={14} color="gray" />
+                                    <Text className="text-md">{item.cronometro} min</Text>
                                 </View>
-                            <Botao2 cta="Entrar" onpress={() => router.push(`../listas/${item.id}`)}/>
-                            <TouchableOpacity onPress={()=> router.push(`../listas/${item.id}`)} className="rounded-full p-2 justify-center items-center mt-2" style={{ backgroundColor: colors.green }}>
-                                <Text className="text-md text-white">Entrar</Text>
+                                <Botao2 cta="Entrar" onpress={() => router.push(`../listas/${item.id}`)} />
                             </TouchableOpacity>
-                        </TouchableOpacity>
-                    )}
-                    ListEmptyComponent={
-                        <Text style={st.vazio}>Nenhuma lista ainda.</Text>
-                    }
-                />
+                        )}
+                        ListEmptyComponent={<Text style={st.vazio}>Nenhuma lista ainda.</Text>}
+                    />
+                </View>
+                <Pressable className="bg-red-500" onPress={deslogar}>
+                    <Text style={st.texto}>Deslogar</Text>
+                </Pressable>
             </View>
-            <Pressable style={st.pressable} onPress={deslogar}>
-                <Text style={st.texto}>Deslogar</Text>
-            </Pressable>
-        </View>
-                    </SafeAreaView>
+        </SafeAreaView>
     );
 }

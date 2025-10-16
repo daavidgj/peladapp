@@ -7,9 +7,6 @@ export const st = StyleSheet.create({
         flex: 1,
         flexDirection: "column",
         gap: 10,
-        borderRadius: 20,
-        paddingHorizontal: 30,
-        paddingVertical: 40,
         justifyContent: "flex-start",
     },
 

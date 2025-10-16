@@ -7,6 +7,10 @@ import { router } from "expo-router";
 import { colors } from "../../components/ui/colors";
 import { st } from "../../components/ui/myStyles";
 import { auth, db } from "../../src/firebaseConnection";
+import MyInputText from "../../components/secundario/myInputText";
+import Botao1 from "../../components/secundario/botao1";
+import Botao2 from "../../components/secundario/botao2";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Cadastro() {
     const [step, setStep] = useState(1);
@@ -21,6 +25,7 @@ export default function Cadastro() {
     }
 
     function voltar() {
+        console.log("voltar");
         if (step > 1) setStep(step - 1);
     }
 
@@ -109,18 +114,12 @@ export default function Cadastro() {
             })
             .catch((err) => {
                 if (err.code === "auth/invalid-email") {
-                    Alert.alert(
-                        "E-mail inválido",
-                        "Por favor, insira um e-mail válido."
-                    );
+                    Alert.alert("E-mail inválido", "Por favor, insira um e-mail válido.");
                     setStep(1);
                     return;
                 }
                 if (err.code === "auth/email-already-in-use") {
-                    Alert.alert(
-                        "E-mail em uso",
-                        "Este e-mail já está cadastrado."
-                    );
+                    Alert.alert("E-mail em uso", "Este e-mail já está cadastrado.");
                     setStep(1);
                     return;
                 }
@@ -129,86 +128,65 @@ export default function Cadastro() {
     }
 
     return (
-        <View style={st.body}>
-            <Header titulo="Cadastro" descricao={`Etapa ${step} de 3`} />
-
-            <View style={st.container}>
-                <View style={st.form}>
+        <SafeAreaView style={{ flex: 1 }}>
+            <Header titulo="Cadastro" descricao={`Etapa ${step} de 2`} />
+            <View className="w-full flex-1 justify-center items-center p-6">
+                <View className="bg-white rounded-lg px-5 py-12 w-full gap-5">
                     {step === 1 && (
                         <>
-                            <Text style={st.formTextLabel}>Nome</Text>
-                            <TextInput
-                                style={st.formInput}
-                                placeholder="Digite seu nome"
-                                value={nome}
-                                onChangeText={setNome}
-                            />
-
-                            <Text style={st.formTextLabel}>Email</Text>
-                            <TextInput
-                                style={st.formInput}
-                                placeholder="Digite seu email"
-                                value={email}
-                                onChangeText={setEmail}
-                                autoCapitalize="none"
-                                keyboardType="email-address"
-                            />
+                            <View>
+                                <MyInputText titulo="Nome Completo" placeholder="Digite o nome" value={nome} onChangeText={setNome} keyboardType="default" />
+                            </View>
+                            <View>
+                                <MyInputText titulo="E-mail" placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" />
+                            </View>
                         </>
                     )}
 
                     {step === 2 && (
                         <>
-                            <Text style={st.formTextLabel}>CPF</Text>
-                            <TextInput
-                                style={st.formInput}
-                                placeholder="Digite seu CPF"
-                                value={cpf}
-                                maxLength={14}
-                                onChangeText={(text) =>
-                                    setCpf(formatarCPF(text))
-                                }
-                                keyboardType="numeric"
-                            />
-
-                            <Text style={st.formTextLabel}>Telefone</Text>
-                            <TextInput
-                                style={st.formInput}
-                                placeholder="Digite seu telefone"
-                                value={telefone}
-                                maxLength={15}
-                                onChangeText={(text) =>
-                                    setTelefone(formatarTelefone(text))
-                                }
-                                keyboardType="phone-pad"
-                            />
-
-                            <Text style={st.formTextLabel}>Senha</Text>
-                            <TextInput
-                                style={st.formInput}
-                                placeholder="Crie uma senha"
-                                value={password}
-                                onChangeText={setPassword}
-                                secureTextEntry
-                            />
+                            <View>
+                                <MyInputText
+                                    maxlength={14}
+                                    titulo="CPF"
+                                    placeholder="CPF"
+                                    value={cpf}
+                                    onChangeText={(i) => setCpf(formatarCPF(i))}
+                                    keyboardType="numeric"
+                                />
+                            </View>
+                            <View>
+                                <MyInputText
+                                    titulo="Telefone"
+                                    placeholder="Telefone"
+                                    value={telefone}
+                                    onChangeText={(i) => setTelefone(formatarTelefone(i))}
+                                    keyboardType="phone-pad"
+                                    maxlength={15}
+                                />
+                            </View>
+                            <View>
+                                <MyInputText titulo="Senha" placeholder="Senha" value={password} onChangeText={setPassword} senha={true} />
+                            </View>
                         </>
                     )}
                 </View>
 
-                <View style={{ gap: 10, marginTop: 10 }}>
-                    {step > 1 && <Button title="Voltar" onPress={voltar} />}
-                    {step < 2 && <Button title="Próximo" onPress={proximo} />}
-                    {step === 2 && (
-                        <>
-                            <Button title="Cadastrar" onPress={signUp} />
-                            <Button
-                                title="Ir para Login"
-                                onPress={() => router.push("../login")}
-                                color={colors.gray}
-                            />
-                        </>
+                <View className="justify-between w-full items-center">
+                    {step > 1 && (
+                        <View className="w-full flex-col justify-center gap-2 items-center" style={{ paddingTop: 8 }}>
+                            <Botao1 cta="Cadastrar" onpress={signUp} />
+                            <Botao2 cta="Voltar" onpress={voltar} type={2} />
+                        </View>
+                    )}
+                    {step < 2 && (
+                        <View className="flex-row gap-5 items-center justify-between">
+                            <Botao2 cta="Voltar para Login" onpress={() => router.push("../login")} type={2} />
+                            <Botao2 cta="Próximo" onpress={proximo} />
+                        </View>
                     )}
                 </View>
             </View>
-        </View>
+        </SafeAreaView>
     );
 }

@@ -1,25 +1,15 @@
 import React, { useState } from "react";
 import { Header } from "../../components/tags/header";
 import { addDoc, collection } from "firebase/firestore";
-import '../../global.css';
-import {
-    View,
-    Text,
-    TextInput,
-    Button,
-    StyleSheet,
-    Alert,
-    Pressable,
-} from "react-native";
-import {
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    updateProfile,
-} from "firebase/auth";
+import { View, Text, Pressable, Image } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db } from "../../src/firebaseConnection"; // ajuste se necessário
 import { Link, router } from "expo-router";
-import { colors } from "../../components/ui/colors";
 import { st } from "../../components/ui/myStyles";
+import MyInputText from "../../components/secundario/myInputText";
+import Botao1 from "../../components/secundario/botao1";
+import Botao2 from "../../components/secundario/botao2";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -28,7 +18,7 @@ export default function Login() {
     function sigIn() {
         signInWithEmailAndPassword(auth, email, password)
             .then(({ user }) => {
-                Alert.alert("Sucesso", "Usuário Logado");
+                alert("Sucesso", "Usuário Logado");
                 console.log("Logou e Redirecionou");
                 router.replace("/"); // Redirecionar corretamente
             })
@@ -36,54 +26,28 @@ export default function Login() {
     }
 
     return (
-        <View style={st.body}>
-            <Header
-                titulo="Login"
-                descricao="Faça o login para acessar a tela de listas da sua pelada"
-            />
-            <View style={st.container} >
-                <View style={st.form}>
-                    <View>
-                        <Text style={st.formTextLabel}>E-mail</Text>
-                        <TextInput
-                            style={st.formInput}
-                            placeholder="Email"
-                            autoCapitalize="none"
-                            value={email}
-                            onChangeText={setEmail}
-                        />
+        <SafeAreaView style={{ flex: 1 }}>
+            <View className="flex-1 justify-center items-center p-6">
+                <Image source={require("../../assets/images/peladaapplogo.png")} className="h-36 w-36" style={{ marginTop: "-30" }} />
+                <View className="bg-white rounded-lg flex px-5 py-12 w-full gap-5 " style={{ marginTop: 0 }}>
+                    <View className="gap-3 items-center">
+                        <Text className="text-xl font-bold">FAÇA O LOGIN</Text>
+                        <Text>Para acessar a tela de listas da sua pelada</Text>
                     </View>
                     <View>
-                        <Text style={st.formTextLabel}>E-mail</Text>
-                        <TextInput
-                            style={st.formInput}
-                            placeholder="Senha"
-                            secureTextEntry
-                            value={password}
-                            onChangeText={setPassword}
-                        />
+                        <MyInputText titulo="E-mail" placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" />
+                    </View>
+                    <View>
+                        <MyInputText titulo="Senha" placeholder="Senha" value={password} onChangeText={setPassword} />
                     </View>
                 </View>
-
-                <Pressable
-                    style={({ pressed }) => [
-                        st.formPressable,
-                        pressed && st.formPressableAtivo,
-                    ]}
-                    onPress={sigIn}
-                >
-                    <Text style={st.formPressableTexto}>Entrar</Text>
-                </Pressable>
-                <Pressable
-                    style={({ pressed }) => [
-                        st.formPressable2,
-                        pressed && st.formPressable2Ativo,
-                    ]}
-                    onPress={() => router.push("../login/cadastro")}
-                >
-                    <Text style={st.formPressable2Texto}>Cadastre-se</Text>
-                </Pressable>
+                <View className="w-full items-center py-5 ">
+                    <Botao1 cta="Entrar" onpress={sigIn} />
+                </View>
+                <View className="">
+                    <Botao2 cta="Cadastrar" onpress={() => router.push("../login/cadastro")} type={2} />
+                </View>
             </View>
-        </View>
+        </SafeAreaView>
     );
 }
