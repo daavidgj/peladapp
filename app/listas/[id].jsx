@@ -11,7 +11,7 @@ import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { colors } from "../../components/ui/colors";
 import { st } from "../../components/ui/myStyles";
 import MyInputText from "../../components/secundario/myInputText";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function CadastroJogador() {
     const [user, setUser] = useState(null);
@@ -217,7 +217,7 @@ export default function CadastroJogador() {
                 <Pressable onPress={() => moverFilaParaFim(fila)}>
                     <Text style={st.h2}> Próximo da Fila: Equipe {fila} </Text>
                 </Pressable>
-                <View className="bg-white border-2 border-slate-200 rounded-lg py-5 px-4 gap-1">
+                <View className=" border-2 border-slate-100 py-5 px-4 gap-1" style={{ borderRadius: 15, backgroundColor: "#ffffff" }} >
                     <View className="justify-between flex-row mb-5">
                         <View className="items-center justify-center">
                             <Text className="text-lg font-bold" style={{ color: colors.green }}>
@@ -226,13 +226,13 @@ export default function CadastroJogador() {
                         </View>
                         <View className="justify-between flex-row gap-5">
                             {ordemFilas.indexOf(fila) != 0 && (
-                                <TouchableOpacity className="p-1 rounded-lg bg-slate-500" onPress={() => moverFilaParaCima(fila)}>
-                                    <Ionicons name="chevron-up" size={22} color={colors.primary} />
+                                <TouchableOpacity className="p-1 rounded-lg bg-slate-100" onPress={() => moverFilaParaCima(fila)}>
+                                    <Ionicons name="chevron-up" size={22} color="#aaaaaa" />
                                 </TouchableOpacity>
                             )}
                             {ordemFilas.indexOf(fila) != ordemFilas.length - 1 && (
-                                <TouchableOpacity className="p-1 rounded-lg bg-slate-500 justify-center" onPress={() => moverFilaParaBaixo(fila)}>
-                                    <Ionicons name="chevron-down" size={22} color={colors.primary} />
+                                <TouchableOpacity className="p-1 rounded-lg bg-slate-100 justify-center" onPress={() => moverFilaParaBaixo(fila)}>
+                                    <Ionicons name="chevron-down" size={22} color="#aaaaaa" />
                                 </TouchableOpacity>
                             )}
                         </View>
@@ -241,9 +241,9 @@ export default function CadastroJogador() {
                         data={jogadoresFila}
                         keyExtractor={(jog) => jog.id}
                         renderItem={({ item }) => (
-                            <View className="bg-slate-100 border-b-2 border-slate-200 flex-row justify-between items-center px-2 py-1 rounded-lg mb-2">
-                                <View className="flex-row gap-2 items-center">
-                                    <Ionicons name="person-circle-outline" size={24} color={colors.green} />
+                            <View className="flex-row justify-between items-center px-2 py-1 rounded-lg mb-2" style={{ backgroundColor: "#f1f5f990" }}>
+                                <View className="flex-row gap-2 items-center" >
+                                    <Ionicons name="person-circle-outline" size={24} color="#a8a8a8" style={{ backgroundColor: colors.white, borderRadius: 100, }} />
                                     <Text className="text-lg">{item.nome}</Text>
                                 </View>
                                 <Pressable onPress={() => removerJogador(fila, item.id)} style={{ marginLeft: 10, padding: 5 }}>
@@ -254,15 +254,20 @@ export default function CadastroJogador() {
                     />
 
                     {!filaCheia && (
-                        <View className="flex-row items-center w-full justify-between gap-5">
-                            <View className="flex-1">
-                                <MyInputText
-                                    placeholder={"Digite o Nome do jogador"}
+                        <View className="flex-row items-center w-full justify-between gap-2">
+                            <View className="flex-1 ">
+                                <TextInput
+                                    className="bg-slate-100 w-full p-3 rounded-lg border border-slate-200"
+                                    placeholder="Digite o Nome do jogador"
+                                    placeholderTextColor={"gray"}
                                     value={nomeJogador[fila] || ""}
                                     onChangeText={(text) => setNomeJogador((prev) => ({ ...prev, [fila]: text }))}
+
                                 />
                             </View>
-                            <TouchableOpacity className="bg-green-500 p-2 rounded-full" onPress={() => adicionarJogador(fila)}>
+                            <Text>
+                            </Text>
+                            <TouchableOpacity className="p-2 rounded-full" style={nomeJogador[fila] != false ? { backgroundColor: colors.green } : { backgroundColor: colors.gray }} onPress={() => adicionarJogador(fila)}>
                                 <Ionicons name="add" size={24} color="white" />
                             </TouchableOpacity>
                         </View>
@@ -300,18 +305,18 @@ export default function CadastroJogador() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <View className="flex-1 justify-center items-center p-6 px-3" style={{ paddingBottom: 100 }}>
-                <Text className="text-xl font-bold">Lista </Text>
+        <SafeAreaProvider>
 
+            <View className="flex-1 px-3" >
                 <FlatList
                     data={ordemFilas}
+                    contentContainerStyle={{ paddingBottom: 110 }}
                     keyExtractor={(item) => item.toString()}
                     renderItem={renderFila}
                     extraData={{ jogadores, nomeJogador, jogadoresNaLinha }}
                     nestedScrollEnabled
                 />
             </View>
-        </SafeAreaView>
+        </SafeAreaProvider>
     );
 }

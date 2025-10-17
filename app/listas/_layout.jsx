@@ -5,6 +5,7 @@ import { st } from "../../components/ui/myStyles";
 import { View, Keyboard } from "react-native";
 import MyTabScreenView from "../../components/secundario/mytabscreenview";
 import { useEffect, useState } from "react";
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function TabsLayout() {
     const [keyboardVisible, setKeyboardVisible] = useState(false);
@@ -24,26 +25,27 @@ export default function TabsLayout() {
     }, []);
     console.log("Keyboard", keyboardVisible);
     return (
+
         <Tabs
             screenOptions={{
                 tabBarStyle: !keyboardVisible
                     ? {
-                          position: "absolute",
-                          bottom: 20,
-                          left: 20,
-                          right: 20,
-                          borderRadius: 200,
-                          borderWidth: 2,
-                          borderStyle: "solid",
-                          borderColor: "#e8e8e8",
-                          height: 70,
-                          marginHorizontal: 30,
-                          paddingTop: 8,
-                          paddingBottom: 0,
-                          shadowColor: "#c8c8c8",
-                          alignItems: "center",
-                          justifyContent: "center",
-                      }
+                        position: "absolute",
+                        bottom: 20,
+                        left: 20,
+                        right: 20,
+                        borderRadius: 200,
+                        borderWidth: 2,
+                        borderStyle: "solid",
+                        borderColor: "#e8e8e8",
+                        height: 70,
+                        marginHorizontal: 30,
+                        paddingTop: 8,
+                        paddingBottom: 0,
+                        shadowColor: "#c8c8c8",
+                        alignItems: "center",
+                        justifyContent: "center",
+                    }
                     : { opacity: 0, maxHeight: 0 },
                 headerShown: false,
                 tabBarActiveTintColor: colors.green,
@@ -55,6 +57,7 @@ export default function TabsLayout() {
                 name="[id]"
                 options={{
                     title: "Minha Lista",
+                    headerShown: false,
                     tabBarIcon: ({ focused }) => <MyTabScreenView icon="list-alt" focused={focused} />,
                 }}
             />
