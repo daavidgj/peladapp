@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useLocalSearchParams, router } from "expo-router";
-import { View, Text, TextInput, TouchableOpacity, Pressable, Alert, FlatList, Keyboard, Vibration } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Pressable, Alert, FlatList, Keyboard, Vibration, Switch } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
 import { auth, db } from "../../src/firebaseConnection";
@@ -26,6 +26,29 @@ export default function CadastroJogador() {
     const [jogadoresNaLinha, setJogadoresNaLinha] = useState(4);
     const [ordemFilas, setOrdemFilas] = useState([1, 2, 3]);
     const [emCampo, setEmCampo] = useState(false);
+    const textoFila = {
+        1: '1º Primeira',
+        2: '2º Segunda',
+        3: '3º Terceira',
+        4: '4º Quarta',
+        5: '5º Quinta',
+        6: '6º Sexta',
+        7: '7º Sétima',
+        8: '8º Oitava',
+        9: '9º Nona',
+        10: '10º Décima',
+        11: '11º Décima Primeira',
+        12: '12º Décima Segunda',
+        13: '13º Décima Terceira',
+        14: '14º Décima Quarta',
+        15: '15º Décima Quinta',
+    };
+    function mensagemProxima(a) {
+        const mensagemAqui = textoFila[a];
+        return (mensagemAqui);
+
+    }
+
 
     // Autenticação
     useEffect(() => {
@@ -213,104 +236,114 @@ export default function CadastroJogador() {
         const filaCheia = jogadoresFila.length >= jogadoresNaLinha;
 
         return (
-            <View className="p-6 gap-5">
-                <Pressable onPress={() => moverFilaParaFim(fila)}>
-                    <Text style={st.h2}> Próximo da Fila: Equipe {fila} </Text>
-                </Pressable>
-                <View className=" border-2 border-slate-100 py-5 px-4 gap-1" style={{ borderRadius: 15, backgroundColor: "#ffffff" }} >
-                    <View className="justify-between flex-row mb-5">
-                        <View className="items-center justify-center">
-                            <Text className="text-lg font-bold" style={{ color: colors.green }}>
-                                Equipe {fila}
-                            </Text>
+            <>
+                <View className="p-6 gap-5">
+                    <Pressable onPress={() => moverFilaParaFim(fila)}>
+                        {ordemFilas.indexOf(fila) != 0 ?
+                            (<Text style={st.h2}> {mensagemProxima(ordemFilas.indexOf(fila) + 1)}</Text>) : (<Text style={[st.h2, { color: colors.green }]}> {mensagemProxima(ordemFilas.indexOf(fila) + 1)}</Text>)}
+                    </Pressable>
+                    <View className=" border-2 border-slate-100 py-5 px-4 gap-1" style={{ borderRadius: 15, backgroundColor: "#ffffff" }} >
+                        <View className="justify-between flex-row mb-5">
+                            <View className="items-center justify-center">
+                                <Text className="text-lg font-bold" style={{ color: colors.green }}>
+                                    Equipe {fila}
+                                </Text>
+                            </View>
+                            <View className="justify-between flex-row gap-5">
+                                {ordemFilas.indexOf(fila) != 0 && (
+                                    <TouchableOpacity className="p-1 rounded-lg bg-slate-100" onPress={() => moverFilaParaCima(fila)}>
+                                        <Ionicons name="chevron-up" size={22} color="#aaaaaa" />
+                                    </TouchableOpacity>
+                                )}
+                                {ordemFilas.indexOf(fila) != ordemFilas.length - 1 && (
+                                    <TouchableOpacity className="p-1 rounded-lg bg-slate-100 justify-center" onPress={() => moverFilaParaBaixo(fila)}>
+                                        <Ionicons name="chevron-down" size={22} color="#aaaaaa" />
+                                    </TouchableOpacity>
+                                )}
+                            </View>
                         </View>
-                        <View className="justify-between flex-row gap-5">
-                            {ordemFilas.indexOf(fila) != 0 && (
-                                <TouchableOpacity className="p-1 rounded-lg bg-slate-100" onPress={() => moverFilaParaCima(fila)}>
-                                    <Ionicons name="chevron-up" size={22} color="#aaaaaa" />
-                                </TouchableOpacity>
-                            )}
-                            {ordemFilas.indexOf(fila) != ordemFilas.length - 1 && (
-                                <TouchableOpacity className="p-1 rounded-lg bg-slate-100 justify-center" onPress={() => moverFilaParaBaixo(fila)}>
-                                    <Ionicons name="chevron-down" size={22} color="#aaaaaa" />
-                                </TouchableOpacity>
-                            )}
-                        </View>
-                    </View>
-                    <FlatList
-                        data={jogadoresFila}
-                        keyExtractor={(jog) => jog.id}
-                        renderItem={({ item }) => (
-                            <View className="flex-row justify-between items-center px-2 py-1 rounded-lg mb-2" style={{ backgroundColor: "#f1f5f990" }}>
-                                <View className="flex-row gap-2 items-center" >
-                                    <Ionicons name="person-circle-outline" size={24} color="#a8a8a8" style={{ backgroundColor: colors.white, borderRadius: 100, }} />
-                                    <Text className="text-lg">{item.nome}</Text>
+                        <FlatList
+                            data={jogadoresFila}
+                            keyExtractor={(jog) => jog.id}
+                            renderItem={({ item }) => (
+                                <View className="flex-row justify-between items-center px-2 py-1 rounded-lg mb-2" style={{ backgroundColor: "#f1f5f990" }}>
+                                    <View className="flex-row gap-2 items-center" >
+                                        <Ionicons name="person-circle-outline" size={24} color="#a8a8a8" style={{ backgroundColor: colors.white, borderRadius: 100, }} />
+                                        <Text className="text-lg">{item.nome}</Text>
+                                    </View>
+                                    <Pressable onPress={() => removerJogador(fila, item.id)} style={{ marginLeft: 10, padding: 5 }}>
+                                        <Ionicons name="trash" size={18} color={colors.secondary} />
+                                    </Pressable>
                                 </View>
-                                <Pressable onPress={() => removerJogador(fila, item.id)} style={{ marginLeft: 10, padding: 5 }}>
-                                    <Ionicons name="trash" size={18} color={colors.secondary} />
-                                </Pressable>
+                            )}
+                        />
+
+                        {!filaCheia && (
+                            <View className="flex-row items-center w-full justify-between gap-2">
+                                <View className="flex-1 ">
+                                    <TextInput
+                                        className="bg-slate-100 w-full p-3 rounded-lg border border-slate-200"
+                                        placeholder="Digite o Nome do jogador"
+                                        placeholderTextColor={"gray"}
+                                        value={nomeJogador[fila] || ""}
+                                        onChangeText={(text) => setNomeJogador((prev) => ({ ...prev, [fila]: text }))}
+
+                                    />
+                                </View>
+                                <Text>
+                                </Text>
+                                <TouchableOpacity className="p-2 rounded-full" style={nomeJogador[fila] != false ? { backgroundColor: colors.green } : { backgroundColor: colors.gray }} onPress={() => adicionarJogador(fila)}>
+                                    <Ionicons name="add" size={24} color="white" />
+                                </TouchableOpacity>
                             </View>
                         )}
-                    />
-
-                    {!filaCheia && (
-                        <View className="flex-row items-center w-full justify-between gap-2">
-                            <View className="flex-1 ">
-                                <TextInput
-                                    className="bg-slate-100 w-full p-3 rounded-lg border border-slate-200"
-                                    placeholder="Digite o Nome do jogador"
-                                    placeholderTextColor={"gray"}
-                                    value={nomeJogador[fila] || ""}
-                                    onChangeText={(text) => setNomeJogador((prev) => ({ ...prev, [fila]: text }))}
-
-                                />
-                            </View>
-                            <Text>
-                            </Text>
-                            <TouchableOpacity className="p-2 rounded-full" style={nomeJogador[fila] != false ? { backgroundColor: colors.green } : { backgroundColor: colors.gray }} onPress={() => adicionarJogador(fila)}>
-                                <Ionicons name="add" size={24} color="white" />
-                            </TouchableOpacity>
-                        </View>
-                    )}
-                    {ordemFilas.indexOf(fila) === 0 && (
-                        <View className="gap-2 items-center mt-5" style={{ marginBottom: "-40" }}>
-                            {jogadoresFila.length < jogadoresNaLinha ? (
-                                <>
-                                    <Text className="text-center" style={{ color: "#ff2222" }}>
-                                        Preencha a Equipe
-                                    </Text>
-                                    <TouchableOpacity className={"p-3 rounded-full w-9/12 mx-auto mt-2 bg-slate-500"} onPress={() => completarEquipe(fila)}>
-                                        <Text className="text-white text-center text-lg">Preencher Lista</Text>
+                        {ordemFilas.indexOf(fila) === 0 && (
+                            <View className="gap-2 items-center mt-5" style={{ marginBottom: "-40" }}>
+                                {jogadoresFila.length < jogadoresNaLinha ? (
+                                    <>
+                                        <Text className="text-center" style={{ color: "#ff2222" }}>
+                                            Preencha a Equipe
+                                        </Text>
+                                        <TouchableOpacity className={"p-3 rounded-full w-9/12 mx-auto mt-2 bg-slate-500"} onPress={() => completarEquipe(fila)}>
+                                            <Text className="text-white text-center text-lg">Preencher Lista</Text>
+                                        </TouchableOpacity>
+                                    </>
+                                ) : (
+                                    <TouchableOpacity
+                                        style={{ backgroundColor: colors.green }}
+                                        className={"p-3 rounded-full w-9/12"}
+                                        onPress={() =>
+                                            Alert.alert("Confirmar", "Deseja realmente subir a equipe?", [
+                                                { text: "Cancelar", style: "cancel" },
+                                                { text: "Entrar", style: "destructive", onPress: () => excluirFila(fila) },
+                                            ])
+                                        }
+                                    >
+                                        <Text className="text-white text-center text-lg">Entrar em Campo</Text>
                                     </TouchableOpacity>
-                                </>
-                            ) : (
-                                <TouchableOpacity
-                                    style={{ backgroundColor: colors.green }}
-                                    className={"p-3 rounded-full w-9/12"}
-                                    onPress={() =>
-                                        Alert.alert("Confirmar", "Deseja realmente subir a equipe?", [
-                                            { text: "Cancelar", style: "cancel" },
-                                            { text: "Entrar", style: "destructive", onPress: () => excluirFila(fila) },
-                                        ])
-                                    }
-                                >
-                                    <Text className="text-white text-center text-lg">Entrar em Campo</Text>
-                                </TouchableOpacity>
-                            )}
-                        </View>
-                    )}
+                                )}
+                            </View>
+                        )}
+                    </View>
                 </View>
-            </View>
+                {(ordemFilas.indexOf(fila) + 1) != ordemFilas.length ? (<View className="bg-zinc-200 h-1 w-72 mx-auto mt-6 mb-2" >
+
+                </View>) : (<View className="justify-center items-center mx-auto mt-6 px-6" >
+                    <Text className="text-center">Fim da Lista, adicione um nome nas equipes completamente vazias para criar uma nova equipe.</Text>
+
+                </View>)}
+
+            </>
         );
     };
 
     return (
-        <SafeAreaProvider>
+        <SafeAreaProvider style={{}}>
 
             <View className="flex-1 px-3" >
                 <FlatList
                     data={ordemFilas}
-                    contentContainerStyle={{ paddingBottom: 110 }}
+                    contentContainerStyle={{ paddingBottom: 110, paddingTop: 30, }}
                     keyExtractor={(item) => item.toString()}
                     renderItem={renderFila}
                     extraData={{ jogadores, nomeJogador, jogadoresNaLinha }}
