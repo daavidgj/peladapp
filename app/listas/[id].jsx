@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useLocalSearchParams, router } from "expo-router";
 import { View, Text, TextInput, TouchableOpacity, Pressable, Alert, FlatList, Keyboard, Vibration, Switch } from "react-native";
-
-import { Ionicons } from "@expo/vector-icons";
+import { MotiView } from "moti";
+import { Easing } from "react-native-reanimated";
+import { Ionicons, Feather } from "@expo/vector-icons";
 import { auth, db } from "../../src/firebaseConnection";
 
 import { onAuthStateChanged } from "firebase/auth";
@@ -11,7 +12,7 @@ import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { colors } from "../../components/ui/colors";
 import { st } from "../../components/ui/myStyles";
 import MyInputText from "../../components/secundario/myInputText";
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function CadastroJogador() {
     const [user, setUser] = useState(null);
@@ -27,28 +28,26 @@ export default function CadastroJogador() {
     const [ordemFilas, setOrdemFilas] = useState([1, 2, 3]);
     const [emCampo, setEmCampo] = useState(false);
     const textoFila = {
-        1: '1º Primeira',
-        2: '2º Segunda',
-        3: '3º Terceira',
-        4: '4º Quarta',
-        5: '5º Quinta',
-        6: '6º Sexta',
-        7: '7º Sétima',
-        8: '8º Oitava',
-        9: '9º Nona',
-        10: '10º Décima',
-        11: '11º Décima Primeira',
-        12: '12º Décima Segunda',
-        13: '13º Décima Terceira',
-        14: '14º Décima Quarta',
-        15: '15º Décima Quinta',
+        1: "1º Primeira",
+        2: "2º Segunda",
+        3: "3º Terceira",
+        4: "4º Quarta",
+        5: "5º Quinta",
+        6: "6º Sexta",
+        7: "7º Sétima",
+        8: "8º Oitava",
+        9: "9º Nona",
+        10: "10º Décima",
+        11: "11º Décima Primeira",
+        12: "12º Décima Segunda",
+        13: "13º Décima Terceira",
+        14: "14º Décima Quarta",
+        15: "15º Décima Quinta",
     };
     function mensagemProxima(a) {
         const mensagemAqui = textoFila[a];
-        return (mensagemAqui);
-
+        return mensagemAqui;
     }
-
 
     // Autenticação
     useEffect(() => {
@@ -239,10 +238,13 @@ export default function CadastroJogador() {
             <>
                 <View className="p-6 gap-5">
                     <Pressable onPress={() => moverFilaParaFim(fila)}>
-                        {ordemFilas.indexOf(fila) != 0 ?
-                            (<Text style={st.h2}> {mensagemProxima(ordemFilas.indexOf(fila) + 1)}</Text>) : (<Text style={[st.h2, { color: colors.green }]}> {mensagemProxima(ordemFilas.indexOf(fila) + 1)}</Text>)}
+                        {ordemFilas.indexOf(fila) != 0 ? (
+                            <Text style={st.h2}> {mensagemProxima(ordemFilas.indexOf(fila) + 1)}</Text>
+                        ) : (
+                            <Text style={[st.h2, { color: colors.green }]}> {mensagemProxima(ordemFilas.indexOf(fila) + 1)}</Text>
+                        )}
                     </Pressable>
-                    <View className=" border-2 border-slate-100 py-5 px-4 gap-1" style={{ borderRadius: 15, backgroundColor: "#ffffff" }} >
+                    <View className=" border-2 border-slate-100 py-5 px-4 gap-1" style={{ borderRadius: 15, backgroundColor: "#ffffff" }}>
                         <View className="justify-between flex-row mb-5">
                             <View className="items-center justify-center">
                                 <Text className="text-lg font-bold" style={{ color: colors.green }}>
@@ -267,8 +269,13 @@ export default function CadastroJogador() {
                             keyExtractor={(jog) => jog.id}
                             renderItem={({ item }) => (
                                 <View className="flex-row justify-between items-center px-2 py-1 rounded-lg mb-2" style={{ backgroundColor: "#f1f5f990" }}>
-                                    <View className="flex-row gap-2 items-center" >
-                                        <Ionicons name="person-circle-outline" size={24} color="#a8a8a8" style={{ backgroundColor: colors.white, borderRadius: 100, }} />
+                                    <View className="flex-row gap-2 items-center">
+                                        <Ionicons
+                                            name="person-circle-outline"
+                                            size={24}
+                                            color="#a8a8a8"
+                                            style={{ backgroundColor: colors.white, borderRadius: 100 }}
+                                        />
                                         <Text className="text-lg">{item.nome}</Text>
                                     </View>
                                     <Pressable onPress={() => removerJogador(fila, item.id)} style={{ marginLeft: 10, padding: 5 }}>
@@ -287,12 +294,14 @@ export default function CadastroJogador() {
                                         placeholderTextColor={"gray"}
                                         value={nomeJogador[fila] || ""}
                                         onChangeText={(text) => setNomeJogador((prev) => ({ ...prev, [fila]: text }))}
-
                                     />
                                 </View>
-                                <Text>
-                                </Text>
-                                <TouchableOpacity className="p-2 rounded-full" style={nomeJogador[fila] != false ? { backgroundColor: colors.green } : { backgroundColor: colors.gray }} onPress={() => adicionarJogador(fila)}>
+                                <Text></Text>
+                                <TouchableOpacity
+                                    className="p-2 rounded-full"
+                                    style={nomeJogador[fila] != false ? { backgroundColor: colors.green } : { backgroundColor: colors.gray }}
+                                    onPress={() => adicionarJogador(fila)}
+                                >
                                     <Ionicons name="add" size={24} color="white" />
                                 </TouchableOpacity>
                             </View>
@@ -309,41 +318,85 @@ export default function CadastroJogador() {
                                         </TouchableOpacity>
                                     </>
                                 ) : (
-                                    <TouchableOpacity
-                                        style={{ backgroundColor: colors.green }}
-                                        className={"p-3 rounded-full w-9/12"}
-                                        onPress={() =>
-                                            Alert.alert("Confirmar", "Deseja realmente subir a equipe?", [
-                                                { text: "Cancelar", style: "cancel" },
-                                                { text: "Entrar", style: "destructive", onPress: () => excluirFila(fila) },
-                                            ])
-                                        }
-                                    >
-                                        <Text className="text-white text-center text-lg">Entrar em Campo</Text>
-                                    </TouchableOpacity>
+                                    <>
+                                        <Pressable
+                                            onLongPress={() => {
+                                                Vibration.vibrate(300);
+                                            }}
+                                            delayLongPress={2000}
+                                        >
+                                            {({ pressed }) => (
+                                                <View
+                                                    style={{ backgroundColor: colors.green, minWidth: "70%" }}
+                                                    className={"p-3 rounded-full justify-center items-center overflow-hidden"}
+                                                >
+                                                    <MotiView
+                                                        from={{ opacity: 0, scale: 0 }}
+                                                        animate={pressed ? { opacity: 0.6, scale: 5 } : { opacity: 0, scale: 0 }}
+                                                        transition={{ type: "timing", duration: pressed ? 1400 : 400, easing: Easing.ease }}
+                                                        className="absolute bottom-0 h-full w-full rounded-full bg-darkGreen-500"
+                                                        style={{ left: 0 }}
+                                                    />
+                                                    <MotiView
+                                                        from={{ opacity: 0, scale: 0 }}
+                                                        animate={pressed ? { opacity: 0.3, scale: 5 } : { opacity: 0, scale: 0 }}
+                                                        transition={{ type: "timing", duration: pressed ? 1000 : 400, easing: Easing.ease }}
+                                                        className="absolute bottom-0 h-full w-full rounded-full bg-green-900"
+                                                        style={{ left: 0 }}
+                                                    />
+                                                    <MotiView
+                                                        from={{ opacity: 0, scale: 0 }}
+                                                        animate={pressed ? { opacity: 0.9, scale: 5 } : { opacity: 0, scale: 0 }}
+                                                        transition={{ type: "timing", duration: pressed ? 2000 : 400, easing: Easing.ease }}
+                                                        className="absolute bottom-0 h-full w-full rounded-full bg-green-900"
+                                                        style={{ left: 0 }}
+                                                    />
+                                                    <MotiView
+                                                        from={{ opacity: 0, scale: 0 }}
+                                                        animate={pressed ? { opacity: 1, scale: 5 } : { opacity: 0, scale: 0 }}
+                                                        transition={{ type: "timing", duration: 300, easing: Easing.ease, delay: pressed ? 2000 : 0 }}
+                                                        className="absolute bottom-0 h-full w-full rounded-full bg-green-900"
+                                                        style={{ left: -30 }}
+                                                    />
+                                                    <Feather name="phone-call" size={24} color="white" />{" "}
+                                                </View>
+                                            )}
+                                        </Pressable>
+                                        <TouchableOpacity
+                                            style={{ backgroundColor: colors.green }}
+                                            className={"p-3 rounded-full w-9/12"}
+                                            onPress={() =>
+                                                Alert.alert("Confirmar", "Deseja realmente subir a equipe?", [
+                                                    { text: "Cancelar", style: "cancel" },
+                                                    { text: "Entrar", style: "destructive", onPress: () => excluirFila(fila) },
+                                                ])
+                                            }
+                                        >
+                                            <Text className="text-white text-center text-lg">Entrar em Campo</Text>
+                                        </TouchableOpacity>
+                                    </>
                                 )}
                             </View>
                         )}
                     </View>
                 </View>
-                {(ordemFilas.indexOf(fila) + 1) != ordemFilas.length ? (<View className="bg-zinc-200 h-1 w-72 mx-auto mt-6 mb-2" >
-
-                </View>) : (<View className="justify-center items-center mx-auto mt-6 px-6" >
-                    <Text className="text-center">Fim da Lista, adicione um nome nas equipes completamente vazias para criar uma nova equipe.</Text>
-
-                </View>)}
-
+                {ordemFilas.indexOf(fila) + 1 != ordemFilas.length ? (
+                    <View className="bg-zinc-200 h-1 w-72 mx-auto mt-6 mb-2"></View>
+                ) : (
+                    <View className="justify-center items-center mx-auto mt-6 px-6">
+                        <Text className="text-center">Fim da Lista, adicione um nome nas equipes completamente vazias para criar uma nova equipe.</Text>
+                    </View>
+                )}
             </>
         );
     };
 
     return (
         <SafeAreaProvider style={{}}>
-
-            <View className="flex-1 px-3" >
+            <View className="flex-1 px-3">
                 <FlatList
                     data={ordemFilas}
-                    contentContainerStyle={{ paddingBottom: 110, paddingTop: 30, }}
+                    contentContainerStyle={{ paddingBottom: 110, paddingTop: 30 }}
                     keyExtractor={(item) => item.toString()}
                     renderItem={renderFila}
                     extraData={{ jogadores, nomeJogador, jogadoresNaLinha }}
