@@ -12,9 +12,10 @@ export const colors = {
     dark: "#1E1E20",
 
     green: "#0A7725",
+    darkgreen: "#13381C",
     greenopacity: "#0A772510",
     sucess: "#4CAF50", // <-- CORRETO
-    error: "#F44336",
+    error: "#780A10",
     warning: "#FF9800",
     info: "#2196F3",
 };

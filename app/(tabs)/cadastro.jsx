@@ -119,7 +119,7 @@ export default function CadastroLista() {
                     </View>
                 </View>
                 <View className="items-center">
-                    <Botao1 cta="Salvar" onpress={() => handleSalvar()} />
+                    <Botao1 cta="Salvar" onpressProp={() => handleSalvar()} />
                 </View>
                 <Pressable onPress={() => router.back()} style={({ pressed }) => [st.formPressable2, pressed && st.formPressable2Ativo]}>
                     <Text style={st.formPressable2Texto}>Voltaraaaaaaa</Text>

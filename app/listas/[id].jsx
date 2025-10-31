@@ -13,8 +13,10 @@ import { colors } from "../../components/ui/colors";
 import { st } from "../../components/ui/myStyles";
 import MyInputText from "../../components/secundario/myInputText";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import Botao1 from "../../components/secundario/botao1";
 
 export default function CadastroJogador() {
+    const [startShake, setStartShake] = useState(false);
     const [user, setUser] = useState(null);
     const { id } = useLocalSearchParams();
 
@@ -267,8 +269,15 @@ export default function CadastroJogador() {
                         <FlatList
                             data={jogadoresFila}
                             keyExtractor={(jog) => jog.id}
-                            renderItem={({ item }) => (
-                                <View className="flex-row justify-between items-center px-2 py-1 rounded-lg mb-2" style={{ backgroundColor: "#f1f5f990" }}>
+                            renderItem={({ item, index: i }) => (
+                                <MotiView
+                                    key={i}
+                                    from={{ opacity: 0, translateX: -40 }}
+                                    animate={{ opacity: 1, translateX: 0 }}
+                                    transition={{ delay: i * 100 }}
+                                    className="flex-row justify-between items-center px-2 py-1 rounded-lg mb-2"
+                                    style={{ backgroundColor: "#f1f5f990" }}
+                                >
                                     <View className="flex-row gap-2 items-center">
                                         <Ionicons
                                             name="person-circle-outline"
@@ -281,7 +290,7 @@ export default function CadastroJogador() {
                                     <Pressable onPress={() => removerJogador(fila, item.id)} style={{ marginLeft: 10, padding: 5 }}>
                                         <Ionicons name="trash" size={18} color={colors.secondary} />
                                     </Pressable>
-                                </View>
+                                </MotiView>
                             )}
                         />
 
@@ -307,81 +316,36 @@ export default function CadastroJogador() {
                             </View>
                         )}
                         {ordemFilas.indexOf(fila) === 0 && (
-                            <View className="gap-2 items-center mt-5" style={{ marginBottom: "-40" }}>
+                            <View className="gap-2 items-center mt-5">
                                 {jogadoresFila.length < jogadoresNaLinha ? (
-                                    <>
-                                        <Text className="text-center" style={{ color: "#ff2222" }}>
-                                            Preencha a Equipe
-                                        </Text>
-                                        <TouchableOpacity className={"p-3 rounded-full w-9/12 mx-auto mt-2 bg-slate-500"} onPress={() => completarEquipe(fila)}>
-                                            <Text className="text-white text-center text-lg">Preencher Lista</Text>
+                                    <View style={{ marginBottom: "-65" }}>
+                                        <TouchableOpacity className={"p-3 rounded-full  mx-auto bg-slate-500"} onPress={() => completarEquipe(fila)}>
+                                            <Text className="text-white text-center">Preencher Lista</Text>
                                         </TouchableOpacity>
-                                    </>
+                                        <Text className="text-center text-red-500">Preencha a Equipe</Text>
+                                    </View>
                                 ) : (
-                                    <>
-                                        <Pressable
-                                            onLongPress={() => {
-                                                Vibration.vibrate(300);
-                                            }}
-                                            delayLongPress={2000}
-                                        >
-                                            {({ pressed }) => (
-                                                <View
-                                                    style={{ backgroundColor: colors.green, minWidth: "70%" }}
-                                                    className={"p-3 rounded-full justify-center items-center overflow-hidden"}
-                                                >
-                                                    <MotiView
-                                                        from={{ opacity: 0, scale: 0 }}
-                                                        animate={pressed ? { opacity: 0.6, scale: 5 } : { opacity: 0, scale: 0 }}
-                                                        transition={{ type: "timing", duration: pressed ? 1400 : 400, easing: Easing.ease }}
-                                                        className="absolute bottom-0 h-full w-full rounded-full bg-darkGreen-500"
-                                                        style={{ left: 0 }}
-                                                    />
-                                                    <MotiView
-                                                        from={{ opacity: 0, scale: 0 }}
-                                                        animate={pressed ? { opacity: 0.3, scale: 5 } : { opacity: 0, scale: 0 }}
-                                                        transition={{ type: "timing", duration: pressed ? 1000 : 400, easing: Easing.ease }}
-                                                        className="absolute bottom-0 h-full w-full rounded-full bg-green-900"
-                                                        style={{ left: 0 }}
-                                                    />
-                                                    <MotiView
-                                                        from={{ opacity: 0, scale: 0 }}
-                                                        animate={pressed ? { opacity: 0.9, scale: 5 } : { opacity: 0, scale: 0 }}
-                                                        transition={{ type: "timing", duration: pressed ? 2000 : 400, easing: Easing.ease }}
-                                                        className="absolute bottom-0 h-full w-full rounded-full bg-green-900"
-                                                        style={{ left: 0 }}
-                                                    />
-                                                    <MotiView
-                                                        from={{ opacity: 0, scale: 0 }}
-                                                        animate={pressed ? { opacity: 1, scale: 5 } : { opacity: 0, scale: 0 }}
-                                                        transition={{ type: "timing", duration: 300, easing: Easing.ease, delay: pressed ? 2000 : 0 }}
-                                                        className="absolute bottom-0 h-full w-full rounded-full bg-green-900"
-                                                        style={{ left: -30 }}
-                                                    />
-                                                    <Feather name="phone-call" size={24} color="white" />{" "}
-                                                </View>
-                                            )}
-                                        </Pressable>
-                                        <TouchableOpacity
-                                            style={{ backgroundColor: colors.green }}
-                                            className={"p-3 rounded-full w-9/12"}
-                                            onPress={() =>
+                                    <View style={{ marginBottom: "-60" }}>
+                                        <Botao1
+                                            cta={"Subir Equipe"}
+                                            onpressProp={() =>
                                                 Alert.alert("Confirmar", "Deseja realmente subir a equipe?", [
                                                     { text: "Cancelar", style: "cancel" },
                                                     { text: "Entrar", style: "destructive", onPress: () => excluirFila(fila) },
                                                 ])
                                             }
-                                        >
-                                            <Text className="text-white text-center text-lg">Entrar em Campo</Text>
-                                        </TouchableOpacity>
-                                    </>
+                                        />
+                                    </View>
                                 )}
                             </View>
                         )}
                     </View>
                 </View>
                 {ordemFilas.indexOf(fila) + 1 != ordemFilas.length ? (
-                    <View className="bg-zinc-200 h-1 w-72 mx-auto mt-6 mb-2"></View>
+                    <View
+                        className="bg-zinc-200 h-1 w-72 mx-auto mt-6 mb-2"
+                        style={ordemFilas.indexOf(fila) != 0 ? { marginTop: "15" } : { marginTop: "35" }}
+                    ></View>
                 ) : (
                     <View className="justify-center items-center mx-auto mt-6 px-6">
                         <Text className="text-center">Fim da Lista, adicione um nome nas equipes completamente vazias para criar uma nova equipe.</Text>
