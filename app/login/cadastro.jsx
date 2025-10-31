@@ -175,7 +175,7 @@ export default function Cadastro() {
                 <View className="justify-between w-full items-center">
                     {step > 1 && (
                         <View className="w-full flex-col justify-center gap-2 items-center" style={{ paddingTop: 8 }}>
-                            <Botao1 cta="Cadastrar" onpress={signUp} />
+                            <Botao1 cta="Cadastrar" onpressProp={signUp} />
                             <Botao2 cta="Voltar" onpress={voltar} type={2} />
                         </View>
                     )}

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Header } from "../../components/tags/header";
 import { addDoc, collection } from "firebase/firestore";
-import { View, Text, Pressable, Image } from "react-native";
+import { View, Text, Pressable, Image,Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db } from "../../src/firebaseConnection"; // ajuste se necessário
@@ -42,7 +42,7 @@ export default function Login() {
                     </View>
                 </View>
                 <View className="w-full items-center py-5 ">
-                    <Botao1 cta="Entrar" onpress={sigIn} />
+                    <Botao1 cta="Entrar" onpressProp={sigIn} />
                 </View>
                 <View className="">
                     <Botao2 cta="Cadastrar" onpress={() => router.push("../login/cadastro")} type={2} />

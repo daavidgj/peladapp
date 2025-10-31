@@ -14,8 +14,11 @@ import { st } from "../../components/ui/myStyles";
 import MyInputText from "../../components/secundario/myInputText";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Botao1 from "../../components/secundario/botao1";
+import ShapeLoading from "../../components/secundario/shapeLoading";
 
 export default function CadastroJogador() {
+    
+    const [isLoading, setIsLoading] = useState(true);
     const [startShake, setStartShake] = useState(false);
     const [user, setUser] = useState(null);
     const { id } = useLocalSearchParams();
@@ -72,6 +75,7 @@ export default function CadastroJogador() {
                     setJogadores(dados.jogadores || {});
                     setOrdemFilas(dados.ordemFilas || [1, 2, 3]);
                     setEmCampo(dados.emCampo || false);
+                    setIsLoading(false);
                 }
             }
         }
@@ -358,6 +362,21 @@ export default function CadastroJogador() {
     return (
         <SafeAreaProvider style={{}}>
             <View className="flex-1 px-3">
+            { isLoading ? (<View className="p-5 pt-8 gap-6">
+                {[1,2,3].map((num) => (
+        <>
+        <View style={{width:'40%', height:30}}>
+                    <ShapeLoading/>
+                </View>
+                <View style={{width:'100%', height:120,marginBottom:20}}>
+                    <ShapeLoading/>
+                </View>
+        </>
+      ))}
+                
+                
+                
+            </View>) : (<View>
                 <FlatList
                     data={ordemFilas}
                     contentContainerStyle={{ paddingBottom: 110, paddingTop: 30 }}
@@ -366,6 +385,9 @@ export default function CadastroJogador() {
                     extraData={{ jogadores, nomeJogador, jogadoresNaLinha }}
                     nestedScrollEnabled
                 />
+            </View>)
+            }
+                
             </View>
         </SafeAreaProvider>
     );

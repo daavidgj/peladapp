@@ -21,7 +21,6 @@ export default function ShapeLoading() {
     ];
 
     const { width, height } = Dimensions.get("window");
-
     return (
         <View className=" overflow-hidden rounded-lg " style={{ height: "100%", width: "100%" }}>
             <MotiView
