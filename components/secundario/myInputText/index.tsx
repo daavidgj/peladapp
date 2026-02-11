@@ -13,7 +13,7 @@ export default function MyInputText({ titulo, placeholder, value, onChangeText, 
             {titulo ? <Text className="text-md">{titulo}</Text> : null}
 
             <TextInput
-                className="bg-slate-100 w-full p-3 rounded-lg border-2 border-slate-200"
+                className="bg-slate-100 w-full p-3 rounded-xl border-2 border-slate-200"
                 placeholder={placeholder}
                 placeholderTextColor={"gray"}
                 value={value}

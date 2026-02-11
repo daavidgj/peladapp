@@ -1,21 +1,30 @@
 import { useEffect, useState } from "react";
 import { View, Text, TextInput, Alert, Pressable } from "react-native";
-import { onAuthStateChanged, updatePassword } from "firebase/auth";
+import { onAuthStateChanged, updatePassword, updateEmail, updateProfile, signOut } from "firebase/auth";
 import { auth } from "../../../src/firebaseConnection";
 import { router } from "expo-router";
-import { Header } from "../../../components/tags/header";
 import { st } from "../../../components/ui/myStyles";
+import MyInput from "../../../components/secundario/myInput";
+import { H1, H2, P, A, Span } from "../../../components/tipografy";
+import Botao1 from "../../../components/secundario/botao1";
+
 
 export default function EditUser() {
     const [novaSenha, setNovaSenha] = useState("");
+    const [novoNome, setNovoNome] = useState("");
+    const [novoEmail, setNovoEmail] = useState("");
     const [carregando, setCarregando] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (userAtual) => {
-            if (!userAtual) {
+
+        const user = auth.currentUser;
+        const unsubscribe = onAuthStateChanged(auth, (u) => {
+            if (!u) {
                 router.replace("/login");
                 return;
             }
+            setNovoNome(user.displayName || "");
+            setNovoEmail(user.email || "");
             setCarregando(false);
         });
 
@@ -45,53 +54,64 @@ export default function EditUser() {
             }
         }
     }
+    async function alterarPerfil() {
 
-    if (carregando) {
-        return (
-            <View style={st.body}>
-                <Header titulo="Editar Senha" descricao="Carregando dados..." />
-            </View>
-        );
+        const user = auth.currentUser;
+        if (!user) return;
+
+        try {
+            if (novoNome !== user.displayName) {
+                await updateProfile(user, { displayName: novoNome });
+            }
+            if (novoEmail !== user.email) {
+                await updateEmail(user, novoEmail);
+            }
+            if (novaSenha.length > 0) {
+                if (novaSenha.length < 6) {
+                    Alert.alert("Erro", "A senha deve ter pelo menos 6 caracteres.");
+                    return;
+                }
+                await updatePassword(auth.currentUser, novaSenha);
+                Alert.alert("Sucesso", "Senha atualizada com sucesso! Faça Login novamente usando a nova senha");
+
+                setNovaSenha("");
+                router.replace("../login");
+                signOut(auth);
+
+            }
+
+            Alert.alert("Sucesso", "Dados atualizados com sucesso.");
+            router.back();
+        } catch (error) {
+            if (error.code === "auth/requires-recent-login") {
+                Alert.alert("Sessão expirada", "Faça login novamente para alterar seus dados.");
+                router.replace("/login");
+            } else {
+                Alert.alert("Erro", error.message);
+            }
+        }
     }
 
+
+
+
     return (
-        <View style={st.body}>
-            <Header titulo="Editar Senha" descricao="Atualize sua senha" />
+        <View style={{ flex: 1 }} className="px-10 py-12 gap-5 ">
 
-            <View style={st.container}>
-                <View style={st.form}>
-                    <Text style={st.formTextLabel}>Nova Senha</Text>
-                    <TextInput
-                        style={st.formInput}
-                        placeholder="Digite a nova senha"
-                        secureTextEntry
-                        value={novaSenha}
-                        onChangeText={setNovaSenha}
-                    />
+            <View >
+                <H1>Editar Informações</H1>
+                <Text>Nova Senha</Text>
+                <View className="gap-5 py-10">
 
-                    <Pressable
-                        style={({ pressed }) => [
-                            st.pressable,
-                            pressed && st.pressableAtivo,
-                            { marginTop: 20 },
-                        ]}
-                        onPress={alterarSenha}
-                    >
-                        <Text style={st.pressableTexto}>Alterar Senha</Text>
-                    </Pressable>
+                    <MyInput placeholder="Digite o novo nome" value={novoNome} onChangeText={setNovoNome} icon="user" />
+                    <MyInput placeholder="Digite o novo Email" value={novoEmail} onChangeText={setNovoEmail} icon="mail" />
+                    <MyInput placeholder="Digite a nova senha" secureTextEntry value={novaSenha} onChangeText={setNovaSenha} icon="lock" />
                 </View>
-
-                <Pressable
-                    style={({ pressed }) => [
-                        st.formPressable2,
-                        pressed && st.formPressable2Ativo,
-                        { marginTop: 20 },
-                    ]}
-                    onPress={() => router.back()}
-                >
-                    <Text style={st.formPressable2Texto}>Voltar</Text>
-                </Pressable>
+                <View className="w-full items-center py-5 ">
+                    <Botao1 onpressProp={alterarPerfil} cta="Salvar">Salvar</Botao1>
+                </View>
             </View>
+
         </View>
     );
 }

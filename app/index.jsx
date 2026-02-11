@@ -11,7 +11,7 @@ export default function HomeScreen() {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
                 console.log("Logado");
-                router.push("(tabs)");
+                router.replace("(tabs)");
             } else {
                 console.log("Não Logado");
                 router.replace("/login");

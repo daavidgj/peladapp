@@ -50,7 +50,7 @@ export default function Botao1({ cta, onpressProp }) {
                             easing: Easing.elastic(1.5),
                         }}
                         style={{
-                            backgroundColor: pressed ? colors.darkgreen : colors.green,
+                            backgroundColor: pressed ? colors.darkgreen : colors.primaryalt,
                             minWidth: "70%",
                         }}
                         className="p-3 px-6 rounded-full justify-center items-center relative overflow-hidden"
@@ -60,29 +60,29 @@ export default function Botao1({ cta, onpressProp }) {
                             from={{ opacity: 0, scale: 0 }}
                             animate={pressed ? { opacity: 0.5, scale: 3 } : { opacity: 0, scale: 0 }}
                             transition={{ type: "timing", duration: 400, easing: Easing.ease }}
-                            className="absolute h-full w-full rounded-full bg-orange-600"
-                            style={{ left: -300, bottom: 0 }}
+                            className="absolute h-full w-full rounded-full"
+                            style={{ left: -300, bottom: 0, backgroundColor: colors.primaryalt }}
                         />
                         <MotiView
                             from={{ opacity: 0, scale: 0 }}
                             animate={pressed ? { opacity: 0.7, scale: 4 } : { opacity: 0, scale: 0 }}
                             transition={{ type: "timing", duration: 900, easing: Easing.ease }}
-                            className="absolute bottom-0 h-full w-full rounded-full bg-orange-600"
+                            className="absolute bottom-0 h-full w-full rounded-full bg-white"
                             style={{ left: -300, bottom: 0 }}
                         />
                         <MotiView
                             from={{ opacity: 0, scale: 0 }}
                             animate={pressed ? { opacity: 0.9, scale: 5 } : { opacity: 0, scale: 0 }}
                             transition={{ type: "timing", duration: 1500, easing: Easing.ease }}
-                            className="absolute h-full w-full rounded-full bg-orange-600"
-                            style={{ left: -300, bottom: 0 }}
+                            className="absolute h-full w-full rounded-full"
+                            style={{ left: -300, bottom: 0, backgroundColor: colors.primaryalt }}
                         />
                         <MotiView
                             from={{ opacity: 0, scale: 0 }}
                             animate={pressed ? { opacity: 1, scale: 5 } : { opacity: 0, scale: 0 }}
                             transition={{ type: "timing", duration: 300, easing: Easing.ease, delay: pressed ? 1500 : 0 }}
-                            className="absolute h-full w-full rounded-full bg-orange-600"
-                            style={{ left: -300, bottom: 0 }}
+                            className="absolute h-full w-full rounded-full"
+                            style={{ left: -300, bottom: 0, backgroundColor: colors.primaryalt }}
                         />
 
                         <Text className="text-white text-center text-lg">{cta || "Entrar em Campo"}</Text>

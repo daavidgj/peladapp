@@ -12,7 +12,11 @@ import { auth } from "../../../src/firebaseConnection";
 import { colors } from "../../../components/ui/colors";
 import { st } from "../../../components/ui/myStyles";
 import { Header } from "../../../components/tags/header";
+import Start from "../../../components/tags/Start";
+import { H1, H2, P, A, Span } from "../../../components/tipografy";
+import { Feather } from "@expo/vector-icons";
 
+import { SafeAreaView } from "react-native-safe-area-context";
 export default function Settings() {
     //deslogar
     async function deslogar() {
@@ -26,41 +30,52 @@ export default function Settings() {
     function test() {
         console.log("a");
     }
+    async function deslogar() {
+        signOut(auth)
+            .then(() => {
+                alert("Sessão encerrada, faça login novamente");
+                console.log("Deslogou e Redirecionou");
+                router.replace("../");
+            })
+            .catch((err) => Alert.alert("Erro", err.code + "\n" + err.message));
+    }
     return (
-        <View style={st.body}>
-            <Header
-                titulo="Configurações"
-                descricao="Altere ou Edite seu perfil"
-            />
-            <View style={st.container}>
+
+        <View className="flex-1">
+            <Start typePlayer={1} />
+            <View className="bg-white flex-1 px-10 py-12 w-full gap-5 items-center " style={{ borderTopLeftRadius: 25, borderTopRightRadius: 25 }}>
                 <View>
-                    <Text style={st.h2}>Editar</Text>
-                    <Text style={st.p}>Edite seus dados</Text>
+                    <H1>Configurações</H1>
+                    <P>Edite suas configurações</P>
                 </View>
-                <Pressable
-                    style={({ pressed }) => [
-                        st.pressable,
-                        pressed && st.pressableAtivo,
-                    ]}
-                    onPress={() => router.push("../settings/edit")}
-                >
-                    <Text style={st.pressableTexto}>Editar</Text>
-                </Pressable>
-                <View style={{ marginTop: 20 }}>
-                    <Text style={st.h2}>Deletar Conta</Text>
-                    <Text style={st.p}>
-                        Apague sua conta de forma permanente
-                    </Text>
+                <View className="w-full gap-5">
+
+                    <View className="flex-row gap-5">
+                        <TouchableOpacity className="gap-2 rounded-lg flex-1 bg-slate-100 p-6 " onPress={() => router.push("../settings/edit")}>
+                            <Feather name="user" size={24} color="black" />
+
+                            <P >Editar</P>
+
+                        </TouchableOpacity>
+                        <TouchableOpacity className="gap-2 rounded-lg w-36 bg-slate-100 p-6 " onPress={() => router.push("../settings/delete")}>
+                            <Feather name="trash" size={24} color="black" />
+                            <P >Deletar Conta</P>
+
+                        </TouchableOpacity>
+                    </View>
+                    <View className="flex-row gap-5">
+                        <TouchableOpacity className="gap-2 rounded-lg w-42 bg-slate-100 p-6 " onPress={() => router.push("../settings/delete")}>
+                            <Feather name="star" size={24} color="black" />
+                            <P >Avalie-nos</P>
+
+                        </TouchableOpacity>
+                        <TouchableOpacity className="gap-2 rounded-lg flex-1 bg-slate-100 p-6 " onPress={deslogar}>
+                            <Feather name="arrow-left" size={24} color="black" />
+                            <P >Sair da Conta</P>
+
+                        </TouchableOpacity>
+                    </View>
                 </View>
-                <Pressable
-                    style={({ pressed }) => [
-                        st.pressable,
-                        pressed && st.pressableAtivo,
-                    ]}
-                    onPress={() => router.push("../settings/delete")}
-                >
-                    <Text style={st.pressableTexto}>Deletar Conta</Text>
-                </Pressable>
             </View>
         </View>
     );

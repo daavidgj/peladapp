@@ -6,8 +6,8 @@ import { colors } from "../../components/ui/colors";
 import { useIsFocused } from "@react-navigation/native";
 import MyTabScreenView from "../../components/secundario/mytabscreenview";
 import { useEffect, useState } from "react";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Keyboard } from "react-native";
+
 
 export default function TabsLayout() {
     const [keyboardVisible, setKeyboardVisible] = useState(false);
@@ -30,6 +30,7 @@ export default function TabsLayout() {
     console.log(isFocused);
 
     return (
+
         <Tabs
             initialRouteName="index"
             screenOptions={{

@@ -7,6 +7,7 @@ import MyTabScreenView from "../../components/secundario/mytabscreenview";
 import { useEffect, useState } from "react";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+
 export default function TabsLayout() {
     /*const [keyboardVisible, setKeyboardVisible] = useState(false);
     useEffect(() => {
@@ -25,16 +26,15 @@ export default function TabsLayout() {
     }, []);
     console.log("Keyboard", keyboardVisible);*/
     return (
-        <SafeAreaProvider>
 
-            <Stack
-                screenOptions={{
-                    headerStyle: { backgroundColor: "#222" },
-                    headerTintColor: "#ffffff",
-                }}
-            >
-                <Stack.Screen name="[id]" options={{ headerShown: true, headerTitle: 'Lista' }} />
-            </Stack>
-        </SafeAreaProvider>
+        <Stack
+            screenOptions={{
+                headerStyle: { backgroundColor: colors.primaryalt },
+                headerTintColor: "#ffffff",
+                headerShown: false,
+            }}
+        >
+            <Stack.Screen name="[id]" options={{ headerShown: true, headerTitle: 'Lista' }} />
+        </Stack>
     );
 }

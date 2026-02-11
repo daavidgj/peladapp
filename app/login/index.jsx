@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Header } from "../../components/tags/header";
 import { addDoc, collection } from "firebase/firestore";
-import { View, Text, Pressable, Image, Alert, TextInput } from "react-native";
+import { View, Text, Pressable, Image, Alert, TextInput, ImageBackground } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db } from "../../src/firebaseConnection"; // ajuste se necessário
@@ -11,6 +11,10 @@ import MyInputText from "../../components/secundario/myInputText";
 import Botao1 from "../../components/secundario/botao1";
 import Botao2 from "../../components/secundario/botao2";
 import { Feather } from "@expo/vector-icons";
+import MyInput from "../../components/secundario/myInput";
+import { H1, H2, P, A, Span } from "../../components/tipografy";
+import { colors } from "../../components/ui/colors";
+
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -28,29 +32,29 @@ export default function Login() {
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <View className="flex-1 justify-center items-center bg-green-300">
-                <View style={{ height: 240 }} className="justify-center items-center">
-                    <Image source={require("../../assets/images/peladaapplogo.png")} className="h-36 w-36" />
+            <View className="flex-1 justify-center items-center">
+                <ImageBackground source={require("../../assets/images/PeladappBackground1.jpg")} resizeMode="cover" style={{ height: 240, width: '100%', marginBottom: '-10', justifyContent: 'flex-end', alignItems: 'center' }}  >
+                    <Image source={require("../../assets/images/Peladapp Player 3d 011.png")} className="h-64" style={{ resizeMode: 'contain' }} />
 
-                </View>
-                <View className="bg-white flex-1 px-10 py-12 w-full gap-5 " style={{ borderTopLeftRadius: 25, borderTopRightRadius: 25 }}>
+                </ImageBackground>
+
+                <View className="bg-white flex-1 px-10 py-12 w-full gap-5 items-center" style={{ borderTopLeftRadius: 25, borderTopRightRadius: 25 }}>
                     <View className="gap-3 items-center">
-                        <Text className="text-xl font-bold">FAÇA O LOGIN</Text>
-                        <Text>Para acessar a tela de listas da sua pelada</Text>
+                        <H1>FAÇA O LOGIN</H1>
+                        <P>Para acessar a tela de listas da sua pelada</P>
                     </View>
-                    <View className="bg-slate-100 rounded-full py-2 px-6 flex-row gap-2  items-center border border-slate-200">
-                        <Feather name='user' color='#b8b8b8' size={24}></Feather>
-                        <TextInput className="flex-1" placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" />
-                    </View>
-                    <View className="bg-slate-100 rounded-full py-2 px-6 flex-row gap-2  items-center border border-slate-200">
-                        <Feather name='lock' color='#b8b8b8' size={24}></Feather>
-                        <TextInput className="flex-1" placeholder="Senha" value={password} onChangeText={setPassword} />
-                    </View>
+                    <MyInput icon="mail" placeholder="Digite o email" value={email} onChangeText={setEmail} keyboardType="email-address" />
+
+                    <MyInput icon="lock" placeholder="Digite a Senha" value={password} onChangeText={setPassword} senha={1} />
                     <View className="w-full items-center py-5 ">
                         <Botao1 cta="Entrar" onpressProp={sigIn} />
                     </View>
-                    <View className="">
-                        <Botao2 cta="Cadastrar" onpress={() => router.push("../login/cadastro")} type={2} />
+                    <View className="flex-row ">
+                        <Span>Não possui uma conta? </Span>
+                        <Pressable onPress={() => router.push("../login/cadastro")} >
+                            <Span><A style={{ color: colors.primaryalt }}>Cadastre-se!</A></Span>
+
+                        </Pressable>
                     </View>
                 </View>
 

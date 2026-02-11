@@ -1,7 +1,6 @@
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert, Pressable } from "react-native";
+import { View, Text, TouchableOpacity, FlatList, Alert, Pressable, Image, ImageBackground } from "react-native";
 import { useEffect, useState } from "react";
 
-import { Ionicons } from "@expo/vector-icons";
 import { auth, db } from "../../src/firebaseConnection";
 import { collection, addDoc, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
@@ -15,6 +14,7 @@ import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MotiView } from "moti";
 import ShapeLoading from "../../components/secundario/shapeLoading";
+import { H1, H2, P, A, Span } from "../../components/tipografy";
 export default function ListagemListas() {
     const [listas, setListas] = useState([]);
     const [user, setUser] = useState(null);
@@ -51,15 +51,7 @@ export default function ListagemListas() {
 
         return () => unsub();
     }, [user]);
-    async function deslogar() {
-        signOut(auth)
-            .then(() => {
-                alert("Sessão encerrada, faça login novamente");
-                console.log("Deslogou e Redirecionou");
-                router.replace("../");
-            })
-            .catch((err) => Alert.alert("Erro", err.code + "\n" + err.message));
-    }
+
 
     {
         return isLoading ? (
@@ -91,49 +83,63 @@ export default function ListagemListas() {
                 </View>
             </View>
         ) : (
-            <SafeAreaView style={st.container}>
+            <View style={st.container}>
                 <Header titulo="Peladas" descricao="Listas da sua pelada" />
-                <View className="flex-1 justify-start px-6 pt-2 gap-3">
-                    <View>
-                        <Text className="text-lg text-black ">Peladas Cadastradas:</Text>
+                <View className="flex-1 justify-start px-6 pt-2 gap-12">
+                    <View className="gap-3">
+
+                        <View>
+                            <H2 >Peladas Cadastradas:</H2>
+                        </View>
+                        <View style={{ flexDirection: "row", marginHorizontal: "-20" }}>
+                            <FlatList
+                                data={listas}
+                                contentContainerStyle={{ gap: 20, paddingHorizontal: 20 }}
+                                horizontal={true}
+                                showsHorizontalScrollIndicator={false}
+                                keyExtractor={(item) => item.id}
+                                renderItem={({ item }) => (
+                                    <TouchableOpacity
+                                        className="bg-white p-5 px-8 rounded-lg border-2 border-slate-100 gap-2"
+                                        onPress={() => router.push(`../listas/${item.id}`)}
+                                    >
+                                        <View className="flex-row gap-2 items-center">
+                                            <Feather name="map-pin" size={14} color="gray" />
+                                            <Text className="text-md">{item.nome}</Text>
+                                        </View>
+                                        <Divider />
+                                        <View className="flex-row gap-2 items-center">
+                                            <Feather name="users" size={14} color="gray" />
+                                            <Text className="text-md">{item.jogadoresNaLinha} na Linha</Text>
+                                        </View>
+                                        <Divider />
+                                        <View className="flex-row gap-2 items-center">
+                                            <Feather name="clock" size={14} color="gray" />
+                                            <Text className="text-md">{item.cronometro} min</Text>
+                                        </View>
+                                        <Botao2 cta="Entrar" onpress={() => router.push(`../listas/${item.id}`)} />
+                                    </TouchableOpacity>
+                                )}
+                                ListEmptyComponent={<Text style={st.vazio}>Nenhuma lista ainda.</Text>}
+                            />
+                        </View>
                     </View>
-                    <View style={{ flexDirection: "row", marginHorizontal: "-20" }}>
-                        <FlatList
-                            data={listas}
-                            contentContainerStyle={{ gap: 20, paddingHorizontal: 20 }}
-                            horizontal={true}
-                            showsHorizontalScrollIndicator={false}
-                            keyExtractor={(item) => item.id}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity
-                                    className="bg-white p-5 px-8 rounded-lg border-2 border-slate-100 gap-2"
-                                    onPress={() => router.push(`../listas/${item.id}`)}
-                                >
-                                    <View className="flex-row gap-2 items-center">
-                                        <Feather name="map-pin" size={14} color="gray" />
-                                        <Text className="text-md">{item.nome}</Text>
-                                    </View>
-                                    <Divider />
-                                    <View className="flex-row gap-2 items-center">
-                                        <Feather name="users" size={14} color="gray" />
-                                        <Text className="text-md">{item.jogadoresNaLinha} na Linha</Text>
-                                    </View>
-                                    <Divider />
-                                    <View className="flex-row gap-2 items-center">
-                                        <Feather name="clock" size={14} color="gray" />
-                                        <Text className="text-md">{item.cronometro} min</Text>
-                                    </View>
-                                    <Botao2 cta="Entrar" onpress={() => router.push(`../listas/${item.id}`)} />
-                                </TouchableOpacity>
-                            )}
-                            ListEmptyComponent={<Text style={st.vazio}>Nenhuma lista ainda.</Text>}
-                        />
+                    <View className="flex-row w-full gap-2 items-center bg-slate-200 rounded-lg">
+
+                        <View className="flex-1 justify-center items-center" >
+                            <Image source={require("../../assets/images/Peladapp Player 3d 012.png")} className="h-48" style={{ resizeMode: 'contain' }} />
+                        </View>
+                        <View className="flex-col w-60 p-4">
+                            <H2>Crie uma Lista</H2>
+                            <Span>Comece a organizar sua pelada com facilidade em poucos cliques</Span>
+                            <View className="w-36">
+                                <Botao2 cta="Criar Lista" onpress={() => router.push(`../cadastro`)} />
+
+                            </View>
+                        </View>
                     </View>
-                    <Pressable className="bg-red-500" onPress={deslogar}>
-                        <Text style={st.texto}>Deslogar</Text>
-                    </Pressable>
                 </View>
-            </SafeAreaView>
+            </View>
         );
     }
 }

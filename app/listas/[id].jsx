@@ -15,9 +15,10 @@ import MyInputText from "../../components/secundario/myInputText";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Botao1 from "../../components/secundario/botao1";
 import ShapeLoading from "../../components/secundario/shapeLoading";
+import { H1, H2, P, A, Span } from "../../components/tipografy";
 
 export default function CadastroJogador() {
-    
+
     const [isLoading, setIsLoading] = useState(true);
     const [startShake, setStartShake] = useState(false);
     const [user, setUser] = useState(null);
@@ -243,18 +244,15 @@ export default function CadastroJogador() {
         return (
             <>
                 <View className="p-6 gap-5">
-                    <Pressable onPress={() => moverFilaParaFim(fila)}>
-                        {ordemFilas.indexOf(fila) != 0 ? (
-                            <Text style={st.h2}> {mensagemProxima(ordemFilas.indexOf(fila) + 1)}</Text>
-                        ) : (
-                            <Text style={[st.h2, { color: colors.green }]}> {mensagemProxima(ordemFilas.indexOf(fila) + 1)}</Text>
-                        )}
-                    </Pressable>
                     <View className=" border-2 border-slate-100 py-5 px-4 gap-1" style={{ borderRadius: 15, backgroundColor: "#ffffff" }}>
                         <View className="justify-between flex-row mb-5">
                             <View className="items-center justify-center">
                                 <Text className="text-lg font-bold" style={{ color: colors.green }}>
-                                    Equipe {fila}
+                                    {ordemFilas.indexOf(fila) != 0 ? (
+                                        <H2 style={st.h2}> {mensagemProxima(ordemFilas.indexOf(fila) + 1)}</H2>
+                                    ) : (
+                                        <H2 style={[st.h2, { color: colors.green }]}> {mensagemProxima(ordemFilas.indexOf(fila) + 1)}</H2>
+                                    )}
                                 </Text>
                             </View>
                             <View className="justify-between flex-row gap-5">
@@ -362,32 +360,32 @@ export default function CadastroJogador() {
     return (
         <SafeAreaProvider style={{}}>
             <View className="flex-1 px-3">
-            { isLoading ? (<View className="p-5 pt-8 gap-6">
-                {[1,2,3].map((num) => (
-        <>
-        <View style={{width:'40%', height:30}}>
-                    <ShapeLoading/>
-                </View>
-                <View style={{width:'100%', height:120,marginBottom:20}}>
-                    <ShapeLoading/>
-                </View>
-        </>
-      ))}
-                
-                
-                
-            </View>) : (<View>
-                <FlatList
-                    data={ordemFilas}
-                    contentContainerStyle={{ paddingBottom: 110, paddingTop: 30 }}
-                    keyExtractor={(item) => item.toString()}
-                    renderItem={renderFila}
-                    extraData={{ jogadores, nomeJogador, jogadoresNaLinha }}
-                    nestedScrollEnabled
-                />
-            </View>)
-            }
-                
+                {isLoading ? (<View className="p-5 pt-8 gap-6">
+                    {[1, 2, 3].map((num) => (
+                        <>
+                            <View style={{ width: '40%', height: 30 }}>
+                                <ShapeLoading />
+                            </View>
+                            <View style={{ width: '100%', height: 120, marginBottom: 20 }}>
+                                <ShapeLoading />
+                            </View>
+                        </>
+                    ))}
+
+
+
+                </View>) : (<View>
+                    <FlatList
+                        data={ordemFilas}
+                        contentContainerStyle={{ paddingBottom: 110, paddingTop: 30 }}
+                        keyExtractor={(item) => item.toString()}
+                        renderItem={renderFila}
+                        extraData={{ jogadores, nomeJogador, jogadoresNaLinha }}
+                        nestedScrollEnabled
+                    />
+                </View>)
+                }
+
             </View>
         </SafeAreaProvider>
     );

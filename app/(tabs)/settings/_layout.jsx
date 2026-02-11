@@ -6,11 +6,11 @@ import { colors } from "../../../components/ui/colors";
 
 export default function UserConfigLayout() {
     return (
+
         <Stack
             screenOptions={{
-                headerStyle: { backgroundColor: "#222" },
+                headerStyle: { backgroundColor: colors.primaryalt },
                 headerTintColor: "#ffffff",
-                tabBarActiveTintColor: colors.info,
                 tabBarInactiveTintColor: "#888",
             }}
         >
@@ -20,11 +20,11 @@ export default function UserConfigLayout() {
             />
             <Stack.Screen
                 name="edit"
-                options={{ title: "Editar Dados", headerShown: false }}
+                options={{ title: "Editar Dados", headerShown: true }}
             />
             <Stack.Screen
                 name="delete"
-                options={{ title: "Deletar Conta", headerShown: false }}
+                options={{ title: "Deletar Conta", headerShown: true }}
             />
         </Stack>
     );
