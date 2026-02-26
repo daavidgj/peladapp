@@ -11,22 +11,22 @@ export default function MyTabScreenView({ icon, focused }) {
                 style={
                     focused
                         ? {
-                              borderRadius: 200,
-                              backgroundColor: focused ? colors.green : colors.gray,
-                              borderStyle: "solid",
-                              borderWidth: 5,
-                              borderColor: colors.primary,
-                              position: "absolute",
-                              bottom: -10,
-                              justifyContent: "center",
-                              alignItems: "center",
-                              height: 70,
-                              width: 70,
-                              alignSelf: "center",
-                              marginHorizontal: "auto",
-                              textAlign: "center",
-                              textAlignVertical: "center",
-                          }
+                            borderRadius: 200,
+                            backgroundColor: focused ? colors.green : colors.gray,
+                            borderStyle: "solid",
+                            borderWidth: 5,
+                            borderColor: colors.primary,
+                            position: "absolute",
+                            bottom: -10,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            height: 70,
+                            width: 70,
+                            alignSelf: "center",
+                            marginHorizontal: "auto",
+                            textAlign: "center",
+                            textAlignVertical: "center",
+                        }
                         : {}
                 }
                 size={28}

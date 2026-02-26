@@ -1,29 +1,76 @@
-import React from "react";
-import { Text, View, TextInput } from "react-native";
-import { MotiView } from "moti";
-import { Easing } from "react-native-reanimated";
+import React, { useState, forwardRef } from "react";
+import { View, TextInput } from "react-native";
+import Animated, { Layout } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
-export default function MyInput({ icon, placeholder, value, onChangeText, keyboardType, senha }) {
-    return (
+import { colors } from "../../ui/colors";
 
-        <MotiView className="bg-slate-100 rounded-full py-2 px-6 flex-row gap-2  items-center border border-slate-200">
+const MyInput = forwardRef(
+    ({ icon, placeholder, value, onChangeText, keyboardType, senha, onSubmitEditing, returnKeyType = "next", onFocus }, ref) => {
+        const [inputPressed, setInputPressed] = useState(false);
 
-            <Feather name={icon ?? 'info'} color='#b8b8b8' size={24}></Feather>
-            <TextInput className="flex-1" placeholder={placeholder} value={value} onChangeText={onChangeText} keyboardType={keyboardType} secureTextEntry={senha ? true : false} />
-        </MotiView>
-    )
-}
-/***
- * 
- * 
-                         <MotiView
-                             from={{ opacity: 0, scale: 0 }}
-                             animate={pressed ? { opacity: 1, scale: 5 } : { opacity: 0, scale: 0 }}
-                             transition={{ type: "timing", duration: 300, easing: Easing.ease, delay: pressed ? 1500 : 0 }}
-                             className="absolute h-full w-full rounded-full bg-orange-600"
-                             style={{ left: -300, bottom: 0 }}
-                         />
- 
-                         <Text className="text-white text-center text-lg">{cta || "Entrar em Campo"}</Text>
-                     </MotiView>
- */
+        switch (icon) {
+            case 1: icon = "user"; break;
+            case 2: icon = "mail"; break;
+            case 3: icon = "lock"; break;
+        }
+
+        return (
+            <View
+                style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    borderRadius: 100,
+                    height: 64,
+                    marginVertical: 4,
+                    overflow: "hidden",
+                }}
+                className="bg-slate-100"
+            >
+                <Animated.View
+                    layout={Layout.springify().damping(15).stiffness(60).duration(600)}
+                    style={{ width: inputPressed ? 0 : 60, alignItems: "center", justifyContent: "center" }}
+                >
+                    <Feather name={icon} color="#b8b8b8" size={24} />
+                </Animated.View>
+
+                <Animated.View
+                    layout={Layout.springify().damping(15).stiffness(60).duration(400)}
+                    style={{ flex: 1 }}
+                >
+                    <TextInput
+                        className="bg-slate-100"
+                        ref={ref} // 🔑 O ref vem do pai
+                        placeholder={placeholder}
+                        value={value}
+                        onChangeText={onChangeText}
+                        keyboardType={keyboardType}
+                        secureTextEntry={!!senha}
+                        onFocus={() => {
+                            setInputPressed(true);
+
+                            setTimeout(() => {
+                                onFocus?.();
+                            }, 80);
+                        }}
+                        onPress={() => {
+                            setInputPressed(true);
+
+                            setTimeout(() => {
+                                onFocus?.();
+                            }, 80);
+                        }}
+
+                        onBlur={() => setInputPressed(false)}
+                        returnKeyType={returnKeyType}
+                        onSubmitEditing={onSubmitEditing}
+                        blurOnSubmit={returnKeyType === "done"}
+                        style={{ color: colors.text, paddingLeft: inputPressed ? 20 : 0 }}
+                        placeholderTextColor={colors.text2}
+                    />
+                </Animated.View>
+            </View>
+        );
+    }
+);
+
+export default MyInput;

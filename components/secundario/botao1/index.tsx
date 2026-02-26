@@ -4,6 +4,7 @@ import { MotiView } from "moti";
 import { Easing } from "react-native-reanimated";
 import { colors } from "../../ui/colors";
 import { useState } from "react";
+import { showToast } from "../../functions/toast";
 
 export default function Botao1({ cta, onpressProp }) {
     const [startShake, setStartShake] = useState(false);
@@ -28,6 +29,7 @@ export default function Botao1({ cta, onpressProp }) {
 
         if (!isLongPress) {
             setAlertaMensagem(true);
+            showToast("Segure para confirmar");
         } else {
             console.log("Botão executado");
             onpressProp();

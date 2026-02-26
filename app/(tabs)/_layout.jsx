@@ -25,26 +25,24 @@ export default function TabsLayout() {
             hideSubscription.remove();
         };
     }, []);
-    console.log("Keyboard", keyboardVisible);
     const isFocused = useIsFocused();
-    console.log(isFocused);
 
     return (
 
         <Tabs
             initialRouteName="index"
             screenOptions={{
-                animation: "fade", // or 'shift'
+                animation: "shift", // or 'shift'
                 transitionSpec: {
                     animation: "timing",
                     config: {
-                        duration: 250,
+                        duration: 425,
                     },
                 },
                 headerShown: false,
                 tabBarStyle: {
                     position: "absolute",
-                    bottom: 60,
+                    bottom: 80,
                     left: 20,
                     right: 20,
                     borderRadius: 200,
@@ -64,18 +62,19 @@ export default function TabsLayout() {
                 tabBarInactiveTintColor: "#888",
             }}
         >
-            <Tabs.Screen
-                name="cadastro"
-                options={{
-                    title: "Cadastro",
-                    tabBarIcon: ({ focused }) => <MyTabScreenView icon="plus" focused={focused} />,
-                }}
-            />
+
             <Tabs.Screen
                 name="index"
                 options={{
                     title: "Minhas Peladas",
                     tabBarIcon: ({ focused }) => <MyTabScreenView icon="list-alt" focused={focused} />,
+                }}
+            />
+            <Tabs.Screen
+                name="cadastro"
+                options={{
+                    title: "Cadastro",
+                    tabBarIcon: ({ focused }) => <MyTabScreenView icon="plus" focused={focused} />,
                 }}
             />
             <Tabs.Screen

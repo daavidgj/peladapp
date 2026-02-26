@@ -16,34 +16,28 @@ import Start from "../../../components/tags/Start";
 import { H1, H2, P, A, Span } from "../../../components/tipografy";
 import { Feather } from "@expo/vector-icons";
 
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function Settings() {
+    const insets = useSafeAreaInsets();
     //deslogar
-    async function deslogar() {
-        signOut(auth)
-            .then(() => {
-                console.log("Deslogou e Redirecionou");
-                router.replace("../");
-            })
-            .catch((err) => Alert.alert("Erro", err.code + "\n" + err.message));
-    }
+
     function test() {
         console.log("a");
     }
     async function deslogar() {
-        signOut(auth)
+        await signOut(auth)
             .then(() => {
-                alert("Sessão encerrada, faça login novamente");
                 console.log("Deslogou e Redirecionou");
-                router.replace("../");
+                router.replace("/login");
+
             })
             .catch((err) => Alert.alert("Erro", err.code + "\n" + err.message));
     }
     return (
 
-        <View className="flex-1">
-            <Start typePlayer={1} />
-            <View className="bg-white flex-1 px-10 py-12 w-full gap-5 items-center " style={{ borderTopLeftRadius: 25, borderTopRightRadius: 25 }}>
+        <View className="flex-1" style={{ marginTop: insets.top }}>
+            <Start typePlayer={2} />
+            <View className="bg-slate-50 flex-1 px-10 py-12 w-full gap-5 items-center " style={{ borderTopLeftRadius: 25, borderTopRightRadius: 25 }}>
                 <View>
                     <H1>Configurações</H1>
                     <P>Edite suas configurações</P>
@@ -69,9 +63,10 @@ export default function Settings() {
                             <P >Avalie-nos</P>
 
                         </TouchableOpacity>
-                        <TouchableOpacity className="gap-2 rounded-lg flex-1 bg-slate-100 p-6 " onPress={deslogar}>
+                        <TouchableOpacity className="gap-2 rounded-lg flex-1 bg-slate-100 p-6 " onPress={() => Alert.alert("Sair da Conta", "Tem certeza que deseja sair da sua conta?", [{ text: "Não", onPress: () => console.log("Cancelado") }, { text: "Sim", onPress: () => deslogar() }])}>
                             <Feather name="arrow-left" size={24} color="black" />
                             <P >Sair da Conta</P>
+
 
                         </TouchableOpacity>
                     </View>

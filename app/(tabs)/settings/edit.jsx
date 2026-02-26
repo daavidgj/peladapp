@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, TextInput, Alert, Pressable } from "react-native";
+import { View, Text, TextInput, Alert, Pressable, FlatList } from "react-native";
 import { onAuthStateChanged, updatePassword, updateEmail, updateProfile, signOut } from "firebase/auth";
 import { auth } from "../../../src/firebaseConnection";
 import { router } from "expo-router";
@@ -7,6 +7,7 @@ import { st } from "../../../components/ui/myStyles";
 import MyInput from "../../../components/secundario/myInput";
 import { H1, H2, P, A, Span } from "../../../components/tipografy";
 import Botao1 from "../../../components/secundario/botao1";
+import ShapeLoading from "../../../components/secundario/shapeLoading";
 
 
 export default function EditUser() {
@@ -18,17 +19,14 @@ export default function EditUser() {
     useEffect(() => {
 
         const user = auth.currentUser;
-        const unsubscribe = onAuthStateChanged(auth, (u) => {
-            if (!u) {
-                router.replace("/login");
-                return;
-            }
+        const carregarInfo = onAuthStateChanged(auth, (u) => {
+
             setNovoNome(user.displayName || "");
             setNovoEmail(user.email || "");
             setCarregando(false);
         });
 
-        return () => unsubscribe();
+        return () => carregarInfo();
     }, []);
 
     async function alterarSenha() {
@@ -95,8 +93,23 @@ export default function EditUser() {
 
 
 
-    return (
-        <View style={{ flex: 1 }} className="px-10 py-12 gap-5 ">
+    return carregando ? (
+        <View className="flex-1 gap-5" style={{ paddingTop: 60, paddingLeft: 20 }}>
+            <View style={{ width: 140, height: 30 }}>
+                <ShapeLoading />
+            </View>
+            <View style={{ width: "90%", height: "60", marginTop: 20 }}>
+                <ShapeLoading />
+            </View>
+            <View style={{ width: "90%", height: "60" }}>
+                <ShapeLoading />
+            </View>
+            <View style={{ width: "90%", height: "60" }}>
+                <ShapeLoading />
+            </View>
+        </View>
+    ) : (
+        <View style={{ flex: 1 }} className="px-10 py-12 gap-5 bg-white">
 
             <View >
                 <H1>Editar Informações</H1>

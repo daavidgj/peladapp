@@ -6,14 +6,13 @@ import { onAuthStateChanged } from "firebase/auth";
 import { colors } from "../../components/ui/colors";
 import { st } from "../../components/ui/myStyles";
 import { router } from "expo-router";
-import { Header } from "../../components/tags/header";
-import Botao2 from "../../components/secundario/botao2";
 import Botao1 from "../../components/secundario/botao1";
 import MyInputText from "../../components/secundario/myInputText";
-import { Feather } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { H1, H2, P, A, Span } from "../../components/tipografy";
 import Start from "../../components/tags/Start";
+import { ActivityIndicator } from "react-native";
+import { showToast } from "../../components/functions/toast";
+
 
 export default function CadastroLista() {
     const [user, setUser] = useState(null);
@@ -21,6 +20,7 @@ export default function CadastroLista() {
     const [nome, setNome] = useState("");
     const [jogadoresNaLinha, setJogadoresNaLinha] = useState(4);
     const [cronometro, setCronometro] = useState("7");
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (usr) => {
@@ -44,30 +44,47 @@ export default function CadastroLista() {
         }
 
         try {
+            setLoading(true);
             await addDoc(collection(db, "usuarios", user.uid, "listas"), {
                 nome,
                 jogadoresNaLinha: Number(jogadoresNaLinha) || 4,
                 cronometro: Number(cronometro) || 7,
                 createdAt: serverTimestamp(),
                 emcampo: false,
-
+                updatedAt: serverTimestamp(),
                 admins: [user.uid],//Primeiro dono da Lista, Lista aceita novos donos convidados
 
             });
-            Alert.alert("Sucesso", "Lista adicionada!");
+            showToast(`Lista ${nome} adicionada com sucesso!`, "LONG");
+            setLoading(false);
             setNome("");
-            setJogadoresNaLinha("4");
+            setJogadoresNaLinha(4);
             setCronometro("7");
+            router.back();
         } catch (error) {
             Alert.alert("Erro", "Não foi possível salvar a lista");
             console.error(error);
         }
     }
 
-    return (
+    return loading ? (
+        <View className="flex-1">
+
+            <Start typePlayer={4} />
+            <View className="bg-slate-50 flex-1 px-10 py-12 w-full gap-5 items-center" style={{ borderTopLeftRadius: 25, borderTopRightRadius: 25 }}>
+                <View className="justify-center items-center">
+                    <H1>Cadastrar Pelada</H1>
+                </View>
+                <View style={{ width: "90%", height: "60", marginTop: 60 }}>
+                    <ActivityIndicator size={120} color={colors.primaryalt} />
+
+                </View>
+            </View>
+        </View>
+    ) : (
         <View style={{ flex: 1 }}>
-            <Start typePlayer={1} />
-            <View className="bg-white flex-1 px-10 py-12 w-full gap-5 items-center" style={{ borderTopLeftRadius: 25, borderTopRightRadius: 25 }}>
+            <Start typePlayer={4} />
+            <View className="bg-slate-50 flex-1 px-10 py-12 w-full gap-5 items-center" style={{ borderTopLeftRadius: 25, borderTopRightRadius: 25 }}>
                 <View className="justify-center items-center">
                     <H1>Cadastrar Pelada</H1>
                 </View>
@@ -77,7 +94,7 @@ export default function CadastroLista() {
                 </View>
                 <View className="flex-row justify-between gap-5 w-full">
                     <View className="gap-3">
-                        <P>Jogadores na Linha</P>
+                        <Span>Jogadores na Linha</Span>
                         <View className="flex-row">
                             <FlatList
                                 contentContainerStyle={{ gap: 4 }}
@@ -86,8 +103,8 @@ export default function CadastroLista() {
                                 renderItem={({ item }) => (
                                     <TouchableOpacity
                                         onPress={() => setJogadoresNaLinha(item)}
-                                        className="px-3 py-2 rounded-xl border-2 border-slate-200"
-                                        style={jogadoresNaLinha === item ? { backgroundColor: colors.green } : { backgroundColor: colors.primary }}
+                                        className="px-3 py-2 rounded-xl border-2 border-slate-100"
+                                        style={jogadoresNaLinha === item ? { backgroundColor: colors.green } : { backgroundColor: colors.white }}
                                     >
                                         <Text style={jogadoresNaLinha === item ? { color: colors.primary } : { color: "gray" }}>{item}</Text>
                                     </TouchableOpacity>

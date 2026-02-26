@@ -1,0 +1,250 @@
+
+import React, { useEffect, useState, useRef } from "react";
+import { View, Text, TouchableOpacity, Vibration } from "react-native";
+import { useLocalSearchParams, router } from "expo-router";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../../../src/firebaseConnection";
+import { Ionicons } from "@expo/vector-icons";
+import { colors } from "../../../components/ui/colors";
+import { H1, H2 } from "../../../components/tipografy";
+//import { Audio } from "expo-av";
+
+export default function Cronometro() {
+
+    const { id } = useLocalSearchParams();
+    const [user, setUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const [ordemFilas, setOrdemFilas] = useState([]);
+    const [jogadores, setJogadores] = useState({});
+    const [emCampo, setEmCampo] = useState(false);
+
+    const [tempoInicial, setTempoInicial] = useState(0);
+    const [tempoAtual, setTempoAtual] = useState(0);
+    const [rodando, setRodando] = useState(false);
+
+    const inicioRef = useRef(null);
+    const intervaloRef = useRef(null);
+
+    // 🔐 Auth
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (usr) => {
+            if (!usr) router.replace("/login");
+            else setUser(usr);
+        });
+        return unsubscribe;
+    }, []);
+
+    // 🔥 Buscar dados
+    useEffect(() => {
+        async function buscarDados() {
+            if (!user || !id) return;
+
+            const docRef = doc(db, "usuarios", user.uid, "listas", id);
+            const snap = await getDoc(docRef);
+
+            if (snap.exists()) {
+                const dados = snap.data();
+                setOrdemFilas(dados.ordemFilas || []);
+                setJogadores(dados.jogadores || []);
+                setEmCampo(dados.emCampo || false);
+
+                // Tempo de teste: 6 segundos
+                const minutos = 0.1;
+                const segundos = minutos * 60;
+
+                setTempoInicial(segundos);
+                setTempoAtual(segundos);
+            }
+
+            setIsLoading(false);
+        }
+
+        buscarDados();
+    }, [user, id]);
+
+    // ⏱ Atualização baseada em horário real
+    useEffect(() => {
+        if (rodando) {
+            intervaloRef.current = setInterval(() => {
+                if (!inicioRef.current) return;
+
+                const agora = Date.now();
+                const tempoPassado = Math.floor((agora - inicioRef.current) / 1000);
+                const restante = tempoInicial - tempoPassado;
+
+                if (restante <= 0) {
+                    clearInterval(intervaloRef.current);
+                    setTempoAtual(0);
+                    setRodando(false);
+                    tocarAlarme(); // toca som + vibração
+                } else {
+                    setTempoAtual(restante);
+                }
+            }, 1000);
+        }
+
+        return () => clearInterval(intervaloRef.current);
+    }, [rodando, tempoInicial]);
+
+    // 🔊 Função para tocar som + vibrar
+    async function tocarAlarme() {
+        try {
+            // Vibração
+            Vibration.vibrate([500, 500, 500]); // 3 pulsos
+
+            // Som
+            const { sound } = await Audio.Sound.createAsync(
+                require("../../../assets/sounds/alarme.mp3")
+            );
+            await sound.playAsync();
+
+        } catch (error) {
+            console.log("Erro ao tocar alarme:", error);
+        }
+    }
+
+    function iniciar() {
+        if (tempoAtual <= 0) return;
+
+        inicioRef.current = Date.now();
+        setRodando(true);
+    }
+
+    function pausar() {
+        setRodando(false);
+
+        const agora = Date.now();
+        const tempoPassado = Math.floor((agora - inicioRef.current) / 1000);
+        const restante = tempoInicial - tempoPassado;
+
+        setTempoAtual(restante);
+        inicioRef.current = null;
+    }
+
+    function reiniciar() {
+        clearInterval(intervaloRef.current);
+        setRodando(false);
+        inicioRef.current = null;
+        setTempoAtual(tempoInicial);
+    }
+
+    function formatarTempo(segundos) {
+        const min = Math.floor(segundos / 60);
+        const sec = segundos % 60;
+        return `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+    }
+
+    if (isLoading) {
+        return (
+            <View className="flex-1 justify-center items-center">
+                <Text>Carregando...</Text>
+            </View>
+        );
+    }
+
+    const primeira = ordemFilas[0];
+    const segunda = ordemFilas[1];
+
+    function renderFila(fila, titulo, destaque = false) {
+        if (!fila) return null;
+        const jogadoresFila = jogadores[fila] || [];
+        return (
+            <View
+                className="p-5 mb-5 rounded-2xl"
+                style={{
+                    backgroundColor: destaque ? colors.green + "20" : "#ffffff",
+                    borderWidth: destaque ? 2 : 1,
+                    borderColor: destaque ? colors.green : "#eeeeee"
+                }}
+            >
+                <View className="flex-row items-center gap-2 mb-3">
+                    <Ionicons
+                        name={destaque ? "football" : "people"}
+                        size={22}
+                        color={destaque ? colors.green : "#888"}
+                    />
+                    <H2 style={{ color: destaque ? colors.green : "#000" }}>
+                        {titulo}
+                    </H2>
+                </View>
+                {jogadoresFila.length === 0 ? (
+                    <Text className="text-gray-400">
+                        Nenhum jogador nessa equipe
+                    </Text>
+                ) : (
+                    jogadoresFila.map((jog) => (
+                        <Text key={jog.id} className="text-base mb-1">
+                            • {jog.nome}
+                        </Text>
+                    ))
+                )}
+            </View>
+        );
+    }
+
+    return (
+        <View className="flex-1 px-6 pt-8">
+
+            <H1>Cronômetro</H1>
+
+            <Text
+                style={{
+                    fontSize: 72,
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    marginVertical: 30,
+                    color: colors.green
+                }}
+            >
+                {formatarTempo(tempoAtual)}
+            </Text>
+
+            <TouchableOpacity
+                onPress={rodando ? pausar : iniciar}
+                style={{
+                    backgroundColor: rodando ? "#ef4444" : colors.green,
+                    paddingVertical: 15,
+                    borderRadius: 50,
+                    marginBottom: 15
+                }}
+            >
+                <Text style={{ color: "#fff", textAlign: "center", fontSize: 18, fontWeight: "bold" }}>
+                    {rodando ? "Pausar" : "Iniciar"}
+                </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                onPress={reiniciar}
+                style={{
+                    backgroundColor: "#64748b",
+                    paddingVertical: 12,
+                    borderRadius: 50
+                }}
+            >
+                <Text style={{ color: "#fff", textAlign: "center", fontSize: 16 }}>
+                    Reiniciar
+                </Text>
+            </TouchableOpacity>
+
+            <H1>Próximas Equipes</H1>
+
+            <View className="mt-6">
+
+                {emCampo && renderFila(primeira, "Em Campo", true)}
+
+                {!emCampo && renderFila(primeira, "🥇 Próxima a Jogar", true)}
+
+                {segunda && renderFila(segunda, "🥈 Segunda Próxima")}
+
+                {ordemFilas.length === 0 && (
+                    <Text className="mt-10 text-center text-gray-400">
+                        Nenhuma equipe cadastrada.
+                    </Text>
+                )}
+
+            </View>
+        </View>
+    );
+}

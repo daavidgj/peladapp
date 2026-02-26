@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View, TextInput } from "react-native";
+import { Span } from "../../tipografy";
 
 export default function MyInputText({ titulo, placeholder, value, onChangeText, keyboardType, maxlength, senha }) {
     return (
@@ -10,10 +11,10 @@ export default function MyInputText({ titulo, placeholder, value, onChangeText, 
             
             
             */}
-            {titulo ? <Text className="text-md">{titulo}</Text> : null}
+            {titulo ? <Span>{titulo}</Span> : null}
 
             <TextInput
-                className="bg-slate-100 w-full p-3 rounded-xl border-2 border-slate-200"
+                className="bg-white w-full p-3 rounded-xl border-2  border-slate-100"
                 placeholder={placeholder}
                 placeholderTextColor={"gray"}
                 value={value}
