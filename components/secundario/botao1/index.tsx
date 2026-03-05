@@ -6,7 +6,7 @@ import { colors } from "../../ui/colors";
 import { useState } from "react";
 import { showToast } from "../../functions/toast";
 
-export default function Botao1({ cta, onpressProp }) {
+export default function Botao1({ cta, onpressProp, disabled }) {
     const [startShake, setStartShake] = useState(false);
     const [isLongPress, setIsLongPress] = useState(false);
     const [alertaMensagem, setAlertaMensagem] = useState(false);
@@ -39,7 +39,7 @@ export default function Botao1({ cta, onpressProp }) {
     };
 
     return (
-        <Pressable onPressIn={handlePressIn} onPressOut={handlePressOut}>
+        <Pressable onPressIn={handlePressIn} onPressOut={handlePressOut} className="w-full" disabled={disabled} style={{ opacity: disabled ? 0.5 : 1 }}>
             {({ pressed }) => (
                 <>
                     <MotiView
@@ -74,14 +74,14 @@ export default function Botao1({ cta, onpressProp }) {
                         />
                         <MotiView
                             from={{ opacity: 0, scale: 0 }}
-                            animate={pressed ? { opacity: 0.9, scale: 5 } : { opacity: 0, scale: 0 }}
+                            animate={pressed ? { opacity: 0.9, scale: 6 } : { opacity: 0, scale: 0 }}
                             transition={{ type: "timing", duration: 1500, easing: Easing.ease }}
                             className="absolute h-full w-full rounded-full"
                             style={{ left: -300, bottom: 0, backgroundColor: colors.primaryalt }}
                         />
                         <MotiView
                             from={{ opacity: 0, scale: 0 }}
-                            animate={pressed ? { opacity: 1, scale: 5 } : { opacity: 0, scale: 0 }}
+                            animate={pressed ? { opacity: 1, scale: 6 } : { opacity: 0, scale: 0 }}
                             transition={{ type: "timing", duration: 300, easing: Easing.ease, delay: pressed ? 1500 : 0 }}
                             className="absolute h-full w-full rounded-full"
                             style={{ left: -300, bottom: 0, backgroundColor: colors.primaryalt }}

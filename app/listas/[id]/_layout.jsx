@@ -80,7 +80,6 @@ export default function TabsLayout() {
         >
 
             <Stack.Screen name="index" options={{ headerTitle: nomePelada }} />
-            <Stack.Screen name="cronometro" options={{ headerTitle: 'Cronometro' }} />
         </Stack>
     );
 }

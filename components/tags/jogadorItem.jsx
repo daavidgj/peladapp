@@ -19,14 +19,14 @@ export default function JogadorItem({ item, fila, removerJogador }) {
             className="flex-row justify-between items-center px-2 py-1 rounded-lg mb-2"
             style={{ backgroundColor: backgroundPressed ? "red" : "#f1f5f990" }}
         >
-            <View className="flex-row gap-2 items-center">
+            <View className="flex-row flex-1 gap-2 items-center">
                 <Ionicons
                     name="person-circle-outline"
                     size={24}
                     color="#a8a8a8"
                     style={{ backgroundColor: colors.white, borderRadius: 100 }}
                 />
-                <P colorWhite={backgroundPressed ? 1 : 2}>{item.nome}</P>
+                <P className="flex-1" colorWhite={backgroundPressed ? 1 : 2} ellipsizeMode="tail" oneLine={true}>{item.nome}</P>
             </View>
 
             <Pressable

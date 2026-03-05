@@ -8,6 +8,7 @@ import MyInput from "../../../components/secundario/myInput";
 import { H1, H2, P, A, Span } from "../../../components/tipografy";
 import Botao1 from "../../../components/secundario/botao1";
 import ShapeLoading from "../../../components/secundario/shapeLoading";
+import Schema from "../../../components/functions/schema";
 
 
 export default function EditUser() {
@@ -15,6 +16,10 @@ export default function EditUser() {
     const [novoNome, setNovoNome] = useState("");
     const [novoEmail, setNovoEmail] = useState("");
     const [carregando, setCarregando] = useState(true);
+
+    const [novoNomeValido, setNovoNomeValido] = useState(false);
+    const [novoEmailValido, setNovoEmailValido] = useState(false);
+    const [novaSenhaValido, setNovaSenhaValido] = useState(false);
 
     useEffect(() => {
 
@@ -30,6 +35,7 @@ export default function EditUser() {
     }, []);
 
     async function alterarSenha() {
+        await Schema.validate({ nome: novoNome, email: novoEmail, senha: novaSenha }, { abortEarly: false });
         if (novaSenha.length < 6) {
             Alert.alert("Erro", "A senha deve ter pelo menos 6 caracteres.");
             return;
@@ -111,17 +117,41 @@ export default function EditUser() {
     ) : (
         <View style={{ flex: 1 }} className="px-10 py-12 gap-5 bg-white">
 
-            <View >
-                <H1>Editar Informações</H1>
-                <Text>Nova Senha</Text>
-                <View className="gap-5 py-10">
+            <View className="flex-1 gap-5" >
+                <View className="">
 
-                    <MyInput placeholder="Digite o novo nome" value={novoNome} onChangeText={setNovoNome} icon="user" />
-                    <MyInput placeholder="Digite o novo Email" value={novoEmail} onChangeText={setNovoEmail} icon="mail" />
-                    <MyInput placeholder="Digite a nova senha" secureTextEntry value={novaSenha} onChangeText={setNovaSenha} icon="lock" />
+                    <H1>Editar Informações</H1>
+                    <P>Alterar suas informações</P>
                 </View>
-                <View className="w-full items-center py-5 ">
-                    <Botao1 onpressProp={alterarPerfil} cta="Salvar">Salvar</Botao1>
+                <View className="gap-5">
+
+
+                    <MyInput
+                        icon={1}
+                        placeholder="Digite o novo Nome"
+                        value={novoNome}
+                        onChangeText={setNovoNome}
+                        validar={false}
+                        onValidate={(validation) => setNovoNomeValido(validation)}
+                    />
+                    <MyInput
+                        icon={2}
+                        placeholder="Digite o novo Email"
+                        value={novoEmail}
+                        editable={false}
+                    />
+                    <MyInput
+                        icon={3}
+                        placeholder="Digite a nova senha"
+                        secureTextEntry
+                        value={novaSenha}
+                        onChangeText={setNovaSenha}
+                        onValidate={(validation) => setNovaSenhaValido(validation)}
+                    />
+
+                </View>
+                <View className="px-14 items-center py-5 ">
+                    <Botao1 onpressProp={alterarPerfil} cta="Salvar" disabled={!novoNomeValido || !novaSenhaValido} />
                 </View>
             </View>
 

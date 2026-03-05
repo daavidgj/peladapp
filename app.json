@@ -31,7 +31,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/peladaapplogo.png"
+      "favicon": "./assets/images/Favicon logo peladapp.jpg"
     },
     "plugins": [
       "expo-router",

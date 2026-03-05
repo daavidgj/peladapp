@@ -2,9 +2,9 @@ import React from "react";
 import { Text } from "react-native";
 import { colors } from "../ui/colors";
 
-export function H1({ children }) {
+export function H1({ children, className }) {
     return (
-        <Text className="" style={{ color: colors.primaryalt, fontFamily: "Poppins_700Bold", fontSize: 25 }}>
+        <Text className="" style={{ color: colors.primaryalt, fontFamily: "Poppins_700Bold", fontSize: 25 }} className={className}>
             {children}
         </Text>
     )
@@ -27,20 +27,20 @@ export function H3({ children }) {
     )
 }
 
-export function P({ children, colorWhite }) {
+export function P({ children, colorWhite, className, ellipsizeMode, oneLine }) {
 
     const color = colorWhite == true ? colors.white : colors.text;
     return (
-        <Text style={{ color: color, fontFamily: "Poppins_400Regular", fontSize: 16 }}>
+        <Text style={{ color: color, fontFamily: "Poppins_400Regular", fontSize: 16 }} className={className} ellipsizeMode={ellipsizeMode} numberOfLines={oneLine ? 1 : undefined}>
             {children}
         </Text>
     )
 }
-export function P2({ children, colorWhite }) {
+export function P2({ children, colorWhite, className }) {
 
     const color = colorWhite == true ? colors.white : colors.text;
     return (
-        <Text style={{ color: color, fontFamily: "Poppins_400Regular", fontSize: 14 }}>
+        <Text style={{ color: color, fontFamily: "Poppins_400Regular", fontSize: 14 }} className={className}>
             {children}
         </Text>
     )
@@ -53,10 +53,10 @@ export function Pbutton({ children, colorWhite }) {
         </Text>
     )
 }
-export function Span({ children, colorWhite }) {
+export function Span({ children, colorWhite, className }) {
     const color = colorWhite == true ? colors.lightwhite : colors.text;
     return (
-        <Text style={{ color: color, fontFamily: "Poppins_400Regular", fontSize: 12 }}>
+        <Text className={className} style={{ color: color, fontFamily: "Poppins_400Regular", fontSize: 12 }}>
             {children}
         </Text>
     )

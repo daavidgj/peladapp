@@ -24,6 +24,7 @@ import scrollToInput from "../../components/functions/scrollDirection";
 import useKeyboard from "../../components/functions/keyboardContext";
 import Animated from "react-native-reanimated";
 import { Layout } from "react-native-reanimated";
+import Schema from "../../components/functions/schema";
 
 
 
@@ -37,6 +38,10 @@ export default function Cadastro() {
 
     const scrollRef = useRef(null);
 
+    const [nomeValido, setNomeValido] = useState(false);
+    const [emailValido, setEmailValido] = useState(false);
+    const [senhaValido, setSenhaValido] = useState(false);
+
     const nomeRef = useRef(null);
     const emailRef = useRef(null);
     const senhaRef = useRef(null);
@@ -47,21 +52,17 @@ export default function Cadastro() {
 
     // Função de cadastro
     async function signUp() {
+        setLoading(true);
 
-        if (nome.trim().length < 3) {
-            Alert.alert("Erro", "Informe um nome válido.");
-
+        if (!nomeValido || !emailValido || !senhaValido) {
+            setLoading(false);
             return;
         }
-        if (password.length < 6) {
-            Alert.alert("Erro", "A senha deve ter pelo menos 6 caracteres.");
-
-            return;
-        }
+        await Schema.validate({ nome, email, senha: password }, { abortEarly: false });
 
         createUserWithEmailAndPassword(auth, email, password)
+
             .then(async ({ user }) => {
-                setLoading(true);
                 await addDoc(collection(db, "usuarios"), {
                     uid: user.uid,
                     email,
@@ -76,10 +77,12 @@ export default function Cadastro() {
             .catch((err) => {
                 if (err.code === "auth/invalid-email") {
                     Alert.alert("E-mail inválido", "Por favor, insira um e-mail válido.");
+                    setLoading(false);
                     return;
                 }
                 if (err.code === "auth/email-already-in-use") {
                     Alert.alert("E-mail em uso", "Este e-mail já está cadastrado.");
+                    setLoading(false);
                     return;
                 }
                 Alert.alert("Erro inesperado", err.message);
@@ -146,6 +149,7 @@ export default function Cadastro() {
                                 ref={nomeRef}
                                 onFocus={() => scrollToInput(nomeRef, scrollRef)}
                                 onSubmitEditing={() => emailRef.current.focus()}
+                                onValidate={(validation) => setNomeValido(validation)}
                             />
 
                             <MyInput
@@ -157,6 +161,8 @@ export default function Cadastro() {
                                 ref={emailRef}
                                 onFocus={() => scrollToInput(emailRef, scrollRef)}
                                 onSubmitEditing={() => senhaRef.current.focus()}
+
+                                onValidate={(validation) => setEmailValido(validation)}
                             />
 
                             <MyInput
@@ -170,10 +176,14 @@ export default function Cadastro() {
 
                                 onFocus={() => scrollToInput(senhaRef, scrollRef)}
                                 onSubmitEditing={() => Keyboard.dismiss()}
+
+                                onValidate={(validation) => setSenhaValido(validation)}
                             />
                         </View>
+                        <View className="items-center ">
+                            <Botao1 cta="Cadastrar" onpressProp={signUp} disabled={!nomeValido && !emailValido && !senhaValido} />
 
-                        <Botao1 cta="Cadastrar" onpressProp={signUp} />
+                        </View>
                         <View className="flex-row "> <Span>Já possui uma conta? </Span> <Pressable onPress={() => router.back()} > <A>Fazer Login</A> </Pressable> </View>
 
                     </ScrollView>

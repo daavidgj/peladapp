@@ -14,6 +14,7 @@ import Start from "../../components/tags/Start";
 export default function RecuperarSenha() {
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
+    const [emailValido, setEmailValido] = useState(false);
 
     async function handleResetPassword() {
         if (!email) {
@@ -52,17 +53,21 @@ export default function RecuperarSenha() {
                 </View>
 
                 <MyInput
-                    icon="mail"
-                    placeholder="Digite seu email"
+                    icon={2} // mail
+                    placeholder="Digite o email"
                     value={email}
                     onChangeText={setEmail}
                     keyboardType="email-address"
+                    onValidate={(validation) => setEmailValido(validation)}
                 />
+                <View className="px-12 items-center  ">
+                    <Botao1
+                        cta={loading ? "Enviando..." : "Enviar link"}
+                        disabled={!emailValido}
+                        onpressProp={handleResetPassword}
+                    />
 
-                <Botao1
-                    cta={loading ? "Enviando..." : "Enviar link"}
-                    onpressProp={handleResetPassword}
-                />
+                </View>
 
                 <Pressable onPress={() => router.back()}>
                     <Span>

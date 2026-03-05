@@ -148,12 +148,12 @@ export default function ListagemListas() {
                                     <H2 colorWhite={true}>Crie uma Lista</H2>
                                     <Span colorWhite={true}>Comece a organizar sua pelada com facilidade em poucos cliques</Span>
                                     <View className="w-36">
-                                        <Botao2 cta="Criar Lista" onpress={() => router.push(`../cadastro`)} />
+                                        <Botao2 cta="Criar Lista" onpress={() => router.push("../cadastro")} />
 
                                     </View>
                                 </View>
 
-                                <View className="flex-1 justify-center items-center px-10  " >
+                                <View className="flex-1 justify-center items-center px-10  " pointerEvents="none">
                                     <Image source={require("../../assets/images/Peladapp Player 3d 013.png")} className="flex-1" style={{ resizeMode: 'contain' }} />
                                 </View>
                             </ImageBackground>
@@ -181,14 +181,15 @@ export default function ListagemListas() {
                         >
                             <ImageBackground source={require("../../assets/images/PeladappBackground1.jpg")} resizeMode="cover" className=" flex-row flex-1 gap-2 items-center"  >
 
-                                <View className="flex-1 justify-center items-center px-10 justify-center " >
+                                <View className="flex-1 justify-center items-center px-10 justify-center " pointerEvents="none">
                                     <Image source={require("../../assets/images/Peladapp Player 3d 012.png")} className="flex-1" style={{ resizeMode: 'contain' }} />
                                 </View>
                                 <View className="flex-col w-60 p-4 pl-10 justify-center">
                                     <H2 colorWhite={true}>Editar Dados</H2>
                                     <Span colorWhite={true}>Edita seu nome, email e senha aqui.</Span>
                                     <View className="w-36">
-                                        <Botao2 cta="Editar" onpress={() => router.push(`../settings`)} />
+                                        <Botao2 cta="Editar" onpress={() => router.push("../settings")} />
+
 
                                     </View>
                                 </View>

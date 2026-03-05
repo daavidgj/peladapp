@@ -12,31 +12,50 @@ import Start from "../../components/tags/Start";
 import useKeyboard from "../../components/functions/keyboardContext";
 import scrollToInput from "../../components/functions/scrollDirection";
 import { ActivityIndicator } from "react-native";
-
+import Schema from "../../components/functions/schema";
 
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [emailValido, setEmailValido] = useState(false);
+    const [senhaValido, setSenhaValido] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const emailRef = useRef(null);
     const senhaRef = useRef(null);
     const { keyboardVisible, keyboardHeight } = useKeyboard();
     const scrollRef = useRef(null);
+    const [errorMessage, setErrorMessage] = useState();
 
-    function sigIn() {
+
+
+
+    async function sigIn() {
         setLoading(true);
+        await Schema
+            .pick(["email", "senha"])
+            .validate(
+                { email, senha: password },
+                { abortEarly: false }
+            );
+        if (!emailValido || !senhaValido) {
+            setLoading(false);
+            return;
+        }
         signInWithEmailAndPassword(auth, email, password)
-            .then(({ user }) => {
 
+            .then(({ user }) => {
                 console.log("Logou e Redirecionou");
                 router.replace("/"); // Redirecionar corretamente
 
             }).catch((err) => {
                 Alert.alert("Erro", err.code + "\n" + err.message);
+                setErrorMessage(err.message);
+                console.log('error', err.message);
 
-                setLoading(true);
+
+                setLoading(false);
             });
     }
 
@@ -98,6 +117,8 @@ export default function Login() {
                             ref={emailRef}
                             onFocus={() => scrollToInput(emailRef, scrollRef)}
                             onSubmitEditing={() => senhaRef.current.focus()} // vai pro próximo input
+                            errMessage={errorMessage}
+                            onValidate={(validation) => setEmailValido(validation)}
                         />
                         <MyInput
                             icon={3} // senha
@@ -109,9 +130,10 @@ export default function Login() {
                             returnKeyType="done"
                             onFocus={() => scrollToInput(senhaRef, scrollRef)}
                             onSubmitEditing={() => Keyboard.dismiss()} // fecha teclado
+                            onValidate={(validation) => setSenhaValido(validation)}
                         />
-                        <View className="w-full items-center py-5 ">
-                            <Botao1 cta="Entrar" onpressProp={sigIn} />
+                        <View className="items-center py-5 gap-5">
+                            <Botao1 cta="Entrar" onpressProp={sigIn} errMessage={errorMessage} disabled={!emailValido || !senhaValido} />
                         </View>
                         <View className="flex-row justify-between items-between w-full px-4 pt-10">
                             <Pressable onPress={() => router.push("../login/recuperar")} >
